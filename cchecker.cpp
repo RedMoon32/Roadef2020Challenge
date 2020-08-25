@@ -3,9 +3,25 @@
 //
 
 #include "cchecker.h"
+#include <utility>
 
 using namespace nlohmann;
 
+#define RESOURCES "Resources"
+#define SEASONS "Seasons"
+#define INTERVENTIONS "Interventions"
+#define EXCLUSIONS "Exclusions"
+#define T_STR  "T"
+#define SCENARIO_NUMBER  "Scenarios_number"
+#define RESOURCE_CHARGE  "workload"
+#define TMAX  "tmax"
+#define DELTA  "Delta"
+#define MAX  "max"
+#define MIN  "min"
+#define RISK  "risk"
+#define START "start"
+#define QUANTILE  "Quantile"
+#define ALPHA  "Alpha"
 
 struct Resource {
     string name;
@@ -25,16 +41,16 @@ struct Intervention {
     int id;
     int tmax;
     vector<int> delta;
-    vector<pair<Resource &, vector<pair<Season &, vector<int>>>>> workload;
-    vector<pair<Season&, vector<vector<int>>>> risk;
+    vector<pair<Resource &, vector<vector<int>>>> workload;
+    vector<pair<Season &, vector<vector<int>>>> risk;
 };
 
-struct Exclusion{
+struct Exclusion {
     string name;
     int id;
-    Intervention& int1;
-    Intervention& int2;
-    Season& season;
+    Intervention &int1;
+    Intervention &int2;
+    Season &season;
 };
 
 struct DataInstance {
@@ -46,9 +62,87 @@ struct DataInstance {
     vector<Resource> resources;
     vector<Exclusion> exclusions;
     vector<int> scenarious_number;
+
 };
 
-json read_file(const string &path) {
+void parseJson(const json &j);
+
+class Parser {
+public:
+    vector<Resource> parseResources();
+
+    vector<Season> parseSeasons();
+
+    vector<Intervention> parseInterventions();
+
+    vector<Exclusion> parseExclusions();
+
+    vector<int> parseScenarious();
+
+    vector<pair<Resource &, vector<vector<int>>>> parseWorkload(vector<Resource> resources, const json& intervention);
+
+    vector<int> parseArray(const json &j);
+
+private:
+    const json &data;
+};
+
+vector<Resource> Parser::parseResources() {
+    vector<Resource> resources;
+    for (auto &el : this->data[RESOURCES].items()) {
+        for (auto &c: el.value().items()) {
+            resources.push_back({el.key(), 0, parseArray(c.value()["max"]), parseArray(c.value()["min"])});
+        }
+    }
+    return resources;
+}
+
+vector<Season> Parser::parseSeasons() {
+    vector<Season> seasons;
+    for (auto &el : this->data[SEASONS].items()) {
+        seasons.push_back({el.key(), 0, parseArray(el.value())});
+    }
+    return seasons;
+}
+
+vector<Intervention> Parser::parseInterventions() {
+    vector<Intervention> interventions;
+    return vector<Intervention>();
+}
+
+vector<Exclusion> Parser::parseExclusions() {
+    return vector<Exclusion>();
+}
+
+vector<int> Parser::parseScenarious() {
+    return vector<int>();
+}
+
+vector<int> Parser::parseArray(const json &j) {
+    vector<int> nums;
+    for (auto &it: j)
+        nums.push_back(it);
+    return nums;
+}
+
+vector<pair<Resource &, vector<vector<int>>>> Parser::parseWorkload(vector<Resource> resources, const json& intervention) {
+    vector<pair<Resource &, vector<vector<int>>>> workloads;
+        // parse workload (iterate over el.value().items()
+    for (auto &workload : intervention["workload"].items()) {
+        vector<vector<int>> first;
+        for (auto &t: workload.value().items()) {
+            vector<int> second;
+            for (auto &tsht: t.value().items()) {
+                second.push_back(tsht.value());
+            }
+            first.push_back(second);
+        }
+        workloads.push_back(make_pair(resources[stoi(workload.key())],first));
+    }
+    return workloads;
+}
+
+json readFile(const string &path) {
     std::ifstream file(path);
     json j;
     file >> j;

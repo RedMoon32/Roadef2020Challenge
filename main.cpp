@@ -10,6 +10,7 @@ using namespace nlohmann;
 
 int main(){
 	cout << " Hello! " << endl;
-	json res = read_file("../example1.json");
+	json res = readFile("../example1.json");
+	parseJson(res);
 	return 0;
 }
