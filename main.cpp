@@ -2,15 +2,17 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-#include "cchecker.h"
+#include "parser.h"
 #include "json.h"
 
 using namespace std;
 using namespace nlohmann;
 
 int main(){
-	cout << " Hello! " << endl;
-	json res = readFile("../example1.json");
-	parseJson(res);
-	return 0;
+    Parser p;
+    auto data = "{\"Resources\": { \"c1\": { \"max\": [ 49, 23, 15 ], \"min\": [ 10, 0, 6 ] } }}"_json;
+    p.data = data;
+    vector<Resource> res = p.parseResources();
+
+    return 0;
 }

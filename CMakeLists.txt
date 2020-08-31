@@ -7,7 +7,19 @@ add_executable(Roadef2020Challenge
         solution/data_reader.cpp
         solution/solution_template.cpp
         main.cpp
-        cchecker.h
+        parser.h
         json.h
-        cchecker.cpp
+        parser.cpp
         )
+
+add_executable(Tests
+        tests.cpp
+        parser.h
+        json.h
+        parser.cpp
+        )
+
+SET(CMAKE_CXX_FLAGS "-O0")
+SET(CMAKE_C_FLAGS "-O0")
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -O3 -Wa,-mbig-obj -std=gnu++14" )
