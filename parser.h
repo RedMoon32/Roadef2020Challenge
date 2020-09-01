@@ -42,9 +42,9 @@ struct Intervention {
 struct Exclusion {
     string name;
     int id;
-    Intervention &int1;
-    Intervention &int2;
-    Season &season;
+    Intervention int1;
+    Intervention int2;
+    Season season;
 };
 
 struct DataInstance {
@@ -73,7 +73,7 @@ public:
 
     vector<Intervention> parseInterventions(vector<Resource> resources);
 
-    vector<Exclusion> parseExclusions();
+    vector<Exclusion> parseExclusions(vector<Intervention> interventions, vector<Season> seasons);
 
     vector<int> parseScenarious();
 

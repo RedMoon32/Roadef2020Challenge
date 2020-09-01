@@ -49,17 +49,25 @@ vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
         auto workload = parseWorkload(resources, cur);
         interventions.push_back({intr.key(), 0, tmax, delta, workload});
     }
-    return vector<Intervention>();
+    return interventions;
 }
 
-vector<Exclusion> Parser::parseExclusions() {
+
+vector<Exclusion> Parser::parseExclusions(vector<Intervention> interventions, vector<Season> seasons) {
     vector<Exclusion> exclusions;
     for (auto &exc: this->data[EXCLUSIONS].items()) {
-        string first = exc.value()[0].get<std::string>();
-        string second = exc.value()[1].get<std::string>();
+        int first = stoi(exc.value()[0].get<std::string>().substr(1)) - 1;
+        int second = stoi(exc.value()[1].get<std::string>().substr(1)) - 1;
         string name = exc.value()[2].get<std::string>();
+        // remake with references and hash map search
+        for (const auto &season: seasons) {
+            if (season.name == name) {
+                exclusions.push_back({exc.key(), 0, interventions[first], interventions[second], season});
+                break;
+            }
+        }
     }
-    return vector<Exclusion>();
+    return exclusions;
 }
 
 vector<int> Parser::parseScenarious() {
@@ -86,8 +94,10 @@ Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
             }
             first.push_back(second);
         }
+        string name = workload.key();
+        int id = stoi(name.substr(1)) - 1;
         workloads.push_back(
-                pair<Resource &, vector<vector<int>>>(resources[stoi(workload.key())], vector<vector<int>>()));
+                pair<Resource &, vector<vector<int>>>(resources[id], first));
     }
     return workloads;
 }
@@ -96,12 +106,12 @@ DataInstance Parser::parseJsonToSchedule() {
     vector<Resource> resources = parseResources();
     vector<Season> seasons = parseSeasons();
     vector<Intervention> interventions = parseInterventions(resources);
-    vector<Exclusion> exclusions = parseExclusions();
+    vector<Exclusion> exclusions = parseExclusions(interventions, seasons);
     vector<int> scenarious_number = parseScenarious();
     int T = data[T];
     double Quantile = data[QUANTILE];
     double Alpha = data[ALPHA];
-    return DataInstance{};
+    return DataInstance{T, Quantile, Alpha, interventions, resources, exclusions, scenarious_number};
 }
 
 Parser::Parser(const string &path) {
