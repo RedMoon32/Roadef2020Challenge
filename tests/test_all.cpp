@@ -4,8 +4,8 @@
 
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-#include "parser.h"
-#include "catch.hpp"
+#include "../parser.h"
+#include "../catch.hpp"
 #include <string>
 
 Parser p;
@@ -44,8 +44,7 @@ TEST_CASE("Interventions are parsed correctly", "[parser]") {
         REQUIRE(i1.tmax == 1);
         REQUIRE(i1.delta == vector<int>{3, 3, 2});
 
-    }
-    SECTION(" Workload parsed correctly") {
+    }SECTION(" Workload parsed correctly") {
 
         REQUIRE(i1.workload.size() == 1);
         auto w1 = i1.workload[0];
@@ -69,8 +68,23 @@ TEST_CASE("Exclusions are parsed correctly", "[parser]") {
         REQUIRE(res[0].season.name == seasons[1].name);
     }
 
-    SECTION("Second exclusion parsed correctly"){
+    SECTION("Second exclusion parsed correctly") {
         REQUIRE(res[1].name == "E2");
         REQUIRE(res[1].season.name == seasons[0].name);
     }
+}
+
+TEST_CASE("scenarious are parsed correctly", "[parser]") {
+    p.data = "{\"Scenarios_number\": [ 3, 1, 2 ] }"_json;
+    vector<int> scenarious = p.parseScenarious();
+    REQUIRE(scenarious.size() == 3);
+    REQUIRE(scenarious == vector<int>{3, 1, 2});
+}
+
+
+TEST_CASE("Time horizon is correct") {
+    vector<Intervention> interventions = {{.tmax = 5,},
+                                          {.tmax = 6},
+                                          {.tmax = 4},
+                                          {.tmax = 7}};
 }

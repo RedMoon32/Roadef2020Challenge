@@ -10,10 +10,12 @@ add_executable(Roadef2020Challenge
         parser.h
         json.h
         parser.cpp
+        checker.cpp
+        checker.h
         )
 
 add_executable(Tests
-        tests.cpp
+        tests/test_all.cpp
         parser.h
         json.h
         parser.cpp
