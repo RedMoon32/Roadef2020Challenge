@@ -6,7 +6,9 @@
 
 #include "../parser.h"
 #include "../catch.hpp"
+#include "../checker.h"
 #include <string>
+
 
 Parser p;
 
@@ -83,8 +85,66 @@ TEST_CASE("scenarious are parsed correctly", "[parser]") {
 
 
 TEST_CASE("Time horizon is correct") {
-    vector<Intervention> interventions = {{.tmax = 5,},
-                                          {.tmax = 6},
-                                          {.tmax = 4},
-                                          {.tmax = 7}};
+    vector<Intervention> interventions = {Intervention{.tmax = 5},
+                                          Intervention{.tmax = 6},
+                                          Intervention{.tmax = 4},
+                                          Intervention{.tmax = 7}};
+
+    DataInstance d{.interventions = interventions,};
+    Checker c(vector<int>{5, 7, 2, 9}, d);
+    REQUIRE(c.checkHorizon() == 2);
+}
+
+TEST_CASE("Resource consumption is correct") {
+    vector<Resource> resources = {{"c1", 0, {20, 30, 30}, {10, 20, 20}},
+                                  {"c2", 1, {10, 20, 20}, {10, 0,  10}}};
+
+    workloadVec workload1{pair<Resource &, vector<vector<int>>>(resources[0], vector<vector<int>>{{10,},
+                                                                                                  {10, 30,},
+                                                                                                  {20, 10, 10}})};
+
+    workloadVec workload2{pair<Resource &, vector<vector<int>>>(resources[1], vector<vector<int>>{{0,},
+                                                                                                  {10, 20,},})};
+
+    workloadVec workload3{pair<Resource &, vector<vector<int>>>(resources[1], vector<vector<int>>{{0,  0, 10},
+                                                                                                  {10, 20,},})};
+
+    Intervention int1 = {.workload = workload1};
+    Intervention int2 = {.workload = workload2};
+    Intervention int3 = {.workload = workload3};
+    vector<Intervention> interventions = {int1, int2, int3};
+
+    DataInstance d{.T = 3, .interventions = interventions, .resources = resources, };
+    Checker c(vector<int>{0, 1, 1}, d);
+
+    int res = c.checkResourceConstraint();
+    REQUIRE(res == 4);
+}
+
+TEST_CASE("Exclusions are correct") {
+    Intervention int1 = {.id = 0};
+    Intervention int2 = {.id = 1};
+    Intervention int3 = {.id = 2};
+
+    Season s1 =  {.name = "first", .times=vector<int>{0, 1}};
+    Season s2 =  {.name = "second", .times=vector<int>{2}};
+
+    Exclusion exc1 = {.id = 0, .int1 = int1, .int2 = int2, s1};
+    Exclusion exc2 = {.id = 1, .int1 = int2, .int2 = int3, s2};
+    vector<Exclusion> exclusions = {exc1, exc2};
+
+    DataInstance d{.exclusions = exclusions};
+
+    Checker c(vector<int>{0, 1, 2}, d);
+    int res = c.checkExclusions();
+    REQUIRE(res == 1);
+
+    c.schedule = vector<int> {2, 0, 0};
+    res = c.checkExclusions();
+    REQUIRE(res == 0);
+
+    c.schedule = vector<int> {0, 2, 2};
+    res = c.checkExclusions();
+    REQUIRE(res == 1);
+
 }

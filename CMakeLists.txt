@@ -19,9 +19,11 @@ add_executable(Tests
         parser.h
         json.h
         parser.cpp
+        checker.h
+        checker.cpp
         )
 
 SET(CMAKE_CXX_FLAGS "-O0")
 SET(CMAKE_C_FLAGS "-O0")
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -O3 -Wa,-mbig-obj -std=gnu++14" )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wa,-mbig-obj -std=gnu++14" )

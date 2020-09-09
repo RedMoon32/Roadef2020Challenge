@@ -30,12 +30,14 @@ struct Season {
     vector<int> times;
 };
 
+typedef vector<pair<Resource &, vector<vector<int>>>> workloadVec;
+
 struct Intervention {
     string name;
     int id;
     int tmax;
     vector<int> delta;
-    vector<pair<Resource &, vector<vector<int>>>> workload;
+    workloadVec workload;
     vector<pair<Season &, vector<vector<int>>>> risk;
 };
 

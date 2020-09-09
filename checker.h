@@ -13,9 +13,9 @@ public:
     int checkAll();
     int checkResourceConstraint();
     int checkHorizon();
-    int checkExclusion();
+    int checkExclusions();
     const DataInstance& data;
-    const vector<int> schedule;
+    vector<int> schedule;
 };
 
 
