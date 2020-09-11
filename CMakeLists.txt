@@ -3,27 +3,28 @@ project(Roadef2020Challenge)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Roadef2020Challenge
-        solution/data_reader.cpp
-        solution/solution_template.cpp
-        main.cpp
-        parser.h
+set(SOURCE_FILES parser.h
         json.h
         parser.cpp
         checker.cpp
-        checker.h
+        checker.h)
+
+add_executable(Roadef2020Challenge
+        main.cpp
+        ${SOURCE_FILES}
         )
+
+add_executable(CheckerBenchmark
+        checker_benchmark.cpp
+        ${SOURCE_FILES})
+
 
 add_executable(Tests
         tests/test_all.cpp
-        parser.h
-        json.h
-        parser.cpp
-        checker.h
-        checker.cpp
+        ${SOURCE_FILES}
         )
 
 SET(CMAKE_CXX_FLAGS "-O0")
 SET(CMAKE_C_FLAGS "-O0")
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wa,-mbig-obj -std=gnu++14" )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wa,-mbig-obj -std=gnu++14")

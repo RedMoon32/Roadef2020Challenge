@@ -30,7 +30,7 @@ struct Season {
     vector<int> times;
 };
 
-typedef vector<pair<Resource &, vector<vector<int>>>> workloadVec;
+typedef vector<pair<Resource , vector<vector<int>>>> workloadVec;
 
 struct Intervention {
     string name;
@@ -79,7 +79,7 @@ public:
 
     vector<int> parseScenarious();
 
-    vector<pair<Resource &, vector<vector<int>>>> parseWorkload(vector<Resource> resources, const json &intervention);
+    vector<pair<Resource , vector<vector<int>>>> parseWorkload(vector<Resource> resources, const json &intervention);
 
     vector<int> parseArray(const json &j);
 

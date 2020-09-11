@@ -4,6 +4,7 @@
 
 #include "parser.h"
 #include <utility>
+#include <map>
 
 using namespace nlohmann;
 
@@ -23,11 +24,17 @@ using namespace nlohmann;
 #define QUANTILE  "Quantile"
 #define ALPHA  "Alpha"
 
+map<string, int> resource_name_mapper;
+map<string, int> intervention_name_mapper;
+
 vector<Resource> Parser::parseResources() {
     vector<Resource> resources;
+    int id = 0;
     for (auto &el : this->data[RESOURCES].items()) {
         auto val = el.value();
-        resources.push_back({el.key(), 0, parseArray(val["max"]), parseArray(val["min"])});
+        resource_name_mapper[el.key()] = id;
+        resources.push_back({el.key(), id, parseArray(val["max"]), parseArray(val["min"])});
+        id++;
     }
     return resources;
 }
@@ -35,19 +42,24 @@ vector<Resource> Parser::parseResources() {
 vector<Season> Parser::parseSeasons() {
     vector<Season> seasons;
     for (auto &el : this->data[SEASONS].items()) {
-        seasons.push_back({el.key(), 0, parseArray(el.value())});
+        auto first = el.key();
+        auto second = el.value();
+        seasons.push_back({first, 0, parseArray(second)});
     }
     return seasons;
 }
 
 vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
     vector<Intervention> interventions;
+    int id = 0;
     for (auto &intr : this->data[INTERVENTIONS].items()) {
         auto cur = intr.value();
-        int tmax = cur["tmax"];
+        int tmax = stoi(cur["tmax"].get<std::string>());
         vector<int> delta = parseArray(cur["Delta"]);
-        auto workload = parseWorkload(resources, cur);
-        interventions.push_back({intr.key(), 0, tmax, delta, workload});
+        vector<pair<Resource, vector<vector<int>>>> workload = parseWorkload(resources, cur);
+        intervention_name_mapper[intr.key()] = id;
+        interventions.push_back({intr.key(), id, tmax, delta, workload});
+        id += 1;
     }
     return interventions;
 }
@@ -56,8 +68,8 @@ vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
 vector<Exclusion> Parser::parseExclusions(vector<Intervention> interventions, vector<Season> seasons) {
     vector<Exclusion> exclusions;
     for (auto &exc: this->data[EXCLUSIONS].items()) {
-        int first = stoi(exc.value()[0].get<std::string>().substr(1)) - 1;
-        int second = stoi(exc.value()[1].get<std::string>().substr(1)) - 1;
+        int first = intervention_name_mapper[exc.value()[0].get<std::string>()];
+        int second = intervention_name_mapper[exc.value()[1].get<std::string>()];
         string name = exc.value()[2].get<std::string>();
         // remake with references and hash map search
         for (const auto &season: seasons) {
@@ -76,14 +88,22 @@ vector<int> Parser::parseScenarious() {
 
 vector<int> Parser::parseArray(const json &j) {
     vector<int> nums;
-    for (auto &it: j)
-        nums.push_back(it);
+    for (auto &it: j) {
+        auto type = it.type();
+        if (type == nlohmann::detail::value_t::string) {
+            string s = it.get<std::string>();
+            nums.push_back(stoi(s));
+        }
+        else{
+            nums.push_back(it);
+        }
+    }
     return nums;
 }
 
-vector<pair<Resource &, vector<vector<int>>>>
+vector<pair<Resource , vector<vector<int>>>>
 Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
-    vector<pair<Resource &, vector<vector<int>>>> workloads;
+    vector<pair<Resource , vector<vector<int>>>> workloads;
     // parse workload (iterate over el.value().items()
     for (auto &workload : intervention["workload"].items()) {
         vector<vector<int>> first;
@@ -95,9 +115,9 @@ Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
             first.push_back(second);
         }
         string name = workload.key();
-        int id = stoi(name.substr(1)) - 1;
+        int id = resource_name_mapper[name];
         workloads.push_back(
-                pair<Resource &, vector<vector<int>>>(resources[id], first));
+                pair<Resource , vector<vector<int>>>(resources[id], first));
     }
     return workloads;
 }
@@ -108,7 +128,7 @@ DataInstance Parser::parseJsonToSchedule() {
     vector<Intervention> interventions = parseInterventions(resources);
     vector<Exclusion> exclusions = parseExclusions(interventions, seasons);
     vector<int> scenarious_number = parseScenarious();
-    int T = data[T];
+    int T = data[T_STR].get<int>();
     double Quantile = data[QUANTILE];
     double Alpha = data[ALPHA];
     return DataInstance{T, Quantile, Alpha, interventions, resources, exclusions, scenarious_number};
