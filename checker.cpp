@@ -15,19 +15,19 @@ int Checker::checkAll() {
 
     int res1 = checkHorizon();
     if (res1 != 0) {
-        cout << endl << "wrong horizon" << endl;
+        // cout << endl << "wrong horizon" << endl;
         return checkHorizon();
-    }
-    res1 = checkResourceConstraint();
-
-    if (res1 != 0) {
-        cout << endl << "wrong resources" << endl;
-        return res1;
     }
 
     res1 = checkExclusions();
     if (res1 != 0) {
-        cout << endl << "wrong exclusions " << endl;
+        // cout << endl << "wrong exclusions " << endl;
+        return 10000 * res1;
+    }
+
+    res1 = checkResourceConstraint();
+    if (res1 != 0) {
+        // cout << endl << "wrong resources" << endl;
         return res1;
     }
 
@@ -35,7 +35,7 @@ int Checker::checkAll() {
 }
 
 int Checker::checkResourceConstraint() {
-    vector<vector<int>> resource_consumption(data.resources.size(), vector<int>(data.T));
+
     int wrong_res = 0;
 
     for (int inter = 0; inter < schedule.size(); inter++) {
@@ -53,9 +53,11 @@ int Checker::checkResourceConstraint() {
     }
 
     for (int res = 0; res < resource_consumption.size(); res++) {
-        for (int time = 0; time < data.T; time++)
-            if (resource_consumption[res][time] < data.resources[res].min[time] )
+        for (int time = 0; time < data.T; time++) {
+            if (resource_consumption[res][time] < data.resources[res].min[time])
                 wrong_res += 1;
+            resource_consumption[res][time] = 0;
+        }
     }
     return wrong_res;
 }
@@ -73,17 +75,17 @@ int Checker::checkHorizon() {
 int Checker::checkExclusions() {
     int excounter = 0;
     for (const auto &exc: data.exclusions) {
-        int time1 = schedule[exc.int1.id];
-        int time2 = schedule[exc.int2.id];
+        int time1 = schedule[exc.int1.id] - 1;
+        int time2 = schedule[exc.int2.id] - 1;
         auto &v = exc.season.times;
-        if (find(v.begin(), v.end(), time1) != v.end() && find(v.begin(), v.end(), time2) != v.end()) {
+        if (binary_search(v.begin(), v.end(), time1) && binary_search(v.begin(), v.end(), time2)) {
             excounter += 1;
         }
     }
     return excounter;
 }
 
-Checker::Checker(const vector<int> schedule, const DataInstance &data) :
+Checker::Checker(vector<int> schedule, const DataInstance &data) :
         data(data), schedule(schedule) {
-
+    resource_consumption = vector<vector<int>>(data.resources.size(), vector<int>(data.T));
 }

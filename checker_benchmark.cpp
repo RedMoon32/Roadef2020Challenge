@@ -6,28 +6,41 @@
 #include "json.h"
 #include "checker.h"
 #include <cstdlib>
+#include <time.h>
+#include "solver.h"
+#include "improved_solver.h"
 
 using namespace std;
 using namespace nlohmann;
+using namespace std::chrono;
 
+#define TIMES 1000
 
 int main() {
+    srand(time(NULL));
     Parser p("../A_set/A_05.json");
+    cout << "==== Reading Data ===" << endl;
     DataInstance d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
-    auto checker = Checker({}, d);
-    vector<int> schedule(d.interventions.size());
+    ImprovedRandomSolver solver(d, -1);
+    vector<int> result;
+    float duration = 0;
 
-    for (int i = 0; i < 100000; i++) {
+    for (int i = 0; i < 1; i++) {
 
-        for (int j = 0; j < schedule.size(); j++) {
-            int cur = rand() % d.T;
-            schedule[j] = cur;
-        }
-        checker.schedule = schedule;
-        int res = checker.checkAll();
+        result = solver.solve();
+
+        clock_t tStart = clock();
+        unique_ptr<AbstractChecker> checker(new Checker(result, d));
+        int res = checker->checkAll();
+
+        clock_t tStop = clock();
+
+        duration += (double)(tStop - tStart) / CLOCKS_PER_SEC ;
+
         cout << "Processed " << i << " , result " << res << endl;
     }
 
+    cout << "\nExecution time " << duration << ", average per check time " << (float) duration / (float) TIMES << endl;
     return 0;
 }

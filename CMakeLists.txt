@@ -3,16 +3,21 @@ project(Roadef2020Challenge)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCE_FILES parser.h
+set(SOURCE_FILES
+        parser.h
         json.h
         parser.cpp
         checker.cpp
-        checker.h)
+        checker.h
+        solver.cpp
+        solver.h
+        improved_solver.cpp
+        improved_solver.h)
 
-add_executable(Roadef2020Challenge
-        main.cpp
-        ${SOURCE_FILES}
-        )
+#add_executable(Roadef2020Challenge
+#        main.cpp
+#        ${SOURCE_FILES}
+#        )
 
 add_executable(CheckerBenchmark
         checker_benchmark.cpp
