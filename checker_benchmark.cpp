@@ -18,8 +18,8 @@ using namespace std::chrono;
 
 int main() {
     srand(time(NULL));
-    Parser p("../A_set/A_05.json");
     cout << "==== Reading Data ===" << endl;
+    Parser p("../A_set/A_06.json");
     DataInstance d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
     ImprovedRandomSolver solver(d, -1);
