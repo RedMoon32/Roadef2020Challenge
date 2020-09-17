@@ -44,7 +44,7 @@ vector<Season> Parser::parseSeasons() {
     for (auto &el : this->data[SEASONS].items()) {
         auto first = el.key();
         auto second = el.value();
-        seasons.push_back({first, 0, parseArray(second)});
+        seasons.push_back({first, 0, parseIntArray(second)});
     }
     return seasons;
 }
@@ -55,8 +55,8 @@ vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
     for (auto &intr : this->data[INTERVENTIONS].items()) {
         auto cur = intr.value();
         int tmax = stoi(cur["tmax"].get<std::string>());
-        vector<int> delta = parseArray(cur["Delta"]);
-        vector<pair<Resource, vector<vector<int>>>> workload = parseWorkload(resources, cur);
+        vector<int> delta = parseIntArray(cur["Delta"]);
+        vector<pair<Resource, vector<vector<float>>>> workload = parseWorkload(resources, cur);
         intervention_name_mapper[intr.key()] = id;
         interventions.push_back({intr.key(), id, tmax, delta, workload});
         id += 1;
@@ -83,16 +83,17 @@ vector<Exclusion> Parser::parseExclusions(vector<Intervention> interventions, ve
 }
 
 vector<int> Parser::parseScenarious() {
-    return parseArray(this->data[SCENARIO_NUMBER]);
+    auto res = parseIntArray(this->data[SCENARIO_NUMBER]);
+    return res;
 }
 
-vector<int> Parser::parseArray(const json &j) {
-    vector<int> nums;
+vector<float> Parser::parseArray(const json &j) {
+    vector<float> nums;
     for (auto &it: j) {
         auto type = it.type();
         if (type == nlohmann::detail::value_t::string) {
             string s = it.get<std::string>();
-            nums.push_back(stoi(s));
+            nums.push_back(stod(s));
         }
         else{
             nums.push_back(it);
@@ -101,14 +102,14 @@ vector<int> Parser::parseArray(const json &j) {
     return nums;
 }
 
-vector<pair<Resource , vector<vector<int>>>>
+vector<pair<Resource , vector<vector<float>>>>
 Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
-    vector<pair<Resource , vector<vector<int>>>> workloads;
+    vector<pair<Resource , vector<vector<float>>>> workloads;
     // parse workload (iterate over el.value().items()
     for (auto &workload : intervention["workload"].items()) {
-        vector<vector<int>> first;
+        vector<vector<float>> first;
         for (auto &t: workload.value().items()) {
-            vector<int> second;
+            vector<float> second;
             for (auto &tsht: t.value().items()) {
                 second.push_back(tsht.value());
             }
@@ -117,7 +118,7 @@ Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
         string name = workload.key();
         int id = resource_name_mapper[name];
         workloads.push_back(
-                pair<Resource , vector<vector<int>>>(resources[id], first));
+                pair<Resource , vector<vector<float>>>(resources[id], first));
     }
     return workloads;
 }
@@ -137,6 +138,11 @@ DataInstance Parser::parseJsonToSchedule() {
 Parser::Parser(const string &path) {
     std::ifstream file(path);
     file >> data;
+}
+
+vector<int> Parser::parseIntArray(const json &j) {
+    auto res = parseArray(j);
+    return vector<int>(res.begin(), res.end());
 }
 
 

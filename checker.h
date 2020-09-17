@@ -33,7 +33,7 @@ public:
     int checkExclusions() override;
 
     vector<int> schedule;
-    vector<vector<int>> resource_consumption;
+    vector<vector<float>> resource_consumption;
     const DataInstance &data;
 };
 

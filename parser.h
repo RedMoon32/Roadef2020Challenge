@@ -20,8 +20,8 @@ using json = nlohmann::json;
 struct Resource {
     string name;
     int id;
-    vector<int> max;
-    vector<int> min;
+    vector<float> max;
+    vector<float> min;
 };
 
 struct Season {
@@ -30,7 +30,7 @@ struct Season {
     vector<int> times;
 };
 
-typedef vector<pair<Resource , vector<vector<int>>>> workloadVec;
+typedef vector<pair<Resource , vector<vector<float>>>> workloadVec;
 
 struct Intervention {
     string name;
@@ -38,7 +38,7 @@ struct Intervention {
     int tmax;
     vector<int> delta;
     workloadVec workload;
-    vector<pair<Season &, vector<vector<int>>>> risk;
+    vector<pair<Season &, vector<vector<float>>>> risk;
 };
 
 struct Exclusion {
@@ -79,9 +79,11 @@ public:
 
     vector<int> parseScenarious();
 
-    vector<pair<Resource , vector<vector<int>>>> parseWorkload(vector<Resource> resources, const json &intervention);
+    vector<pair<Resource , vector<vector<float>>>> parseWorkload(vector<Resource> resources, const json &intervention);
 
-    vector<int> parseArray(const json &j);
+    vector<float> parseArray(const json &j);
+
+    vector<int> parseIntArray(const json &j);
 
     json data;
 };

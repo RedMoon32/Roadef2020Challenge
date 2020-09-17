@@ -66,7 +66,7 @@ int Checker::checkHorizon() {
     int wrong = 0;
     for (int inter = 0; inter < schedule.size(); inter++) {
         int time = schedule[inter];
-        if (time > data.interventions[inter].tmax)
+        if (time >= data.interventions[inter].tmax)
             wrong++;
     }
     return wrong;
@@ -75,8 +75,8 @@ int Checker::checkHorizon() {
 int Checker::checkExclusions() {
     int excounter = 0;
     for (const auto &exc: data.exclusions) {
-        int time1 = schedule[exc.int1.id] - 1;
-        int time2 = schedule[exc.int2.id] - 1;
+        int time1 = schedule[exc.int1.id] + 1;
+        int time2 = schedule[exc.int2.id] + 1;
         auto &v = exc.season.times;
         if (binary_search(v.begin(), v.end(), time1) && binary_search(v.begin(), v.end(), time2)) {
             excounter += 1;
@@ -87,5 +87,5 @@ int Checker::checkExclusions() {
 
 Checker::Checker(vector<int> schedule, const DataInstance &data) :
         data(data), schedule(schedule) {
-    resource_consumption = vector<vector<int>>(data.resources.size(), vector<int>(data.T));
+    resource_consumption = vector<vector<float>>(data.resources.size(), vector<float>(data.T));
 }

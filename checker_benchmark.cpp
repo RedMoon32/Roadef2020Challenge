@@ -19,7 +19,7 @@ using namespace std::chrono;
 int main() {
     srand(time(NULL));
     cout << "==== Reading Data ===" << endl;
-    Parser p("../A_set/A_06.json");
+    Parser p("../A_set/A_05.json");
     DataInstance d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
     ImprovedRandomSolver solver(d, -1);
@@ -32,7 +32,7 @@ int main() {
 
         clock_t tStart = clock();
         unique_ptr<AbstractChecker> checker(new Checker(result, d));
-        int res = checker->checkAll();
+        float res = checker->checkAll();
 
         clock_t tStop = clock();
 
@@ -40,7 +40,7 @@ int main() {
 
         cout << "Processed " << i << " , result " << res << endl;
     }
-
+    write_result("../out.txt", result, d.interventions);
     cout << "\nExecution time " << duration << ", average per check time " << (float) duration / (float) TIMES << endl;
     return 0;
 }

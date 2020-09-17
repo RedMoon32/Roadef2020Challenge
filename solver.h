@@ -14,6 +14,8 @@ public:
 
 };
 
+void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);
+
 class RandomSolver : public AbstractSolver {
 public:
     RandomSolver(const DataInstance &data, int computationTime);

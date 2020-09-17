@@ -28,10 +28,10 @@ vector<int> ImprovedRandomSolver::solve() {
             best_score = score;
             cout << "pre iteration " << i << " new best found " << best_score << endl;
         }
-        //cout << "pre - iteration " << i << ", result " << best_score << endl;
+
     }
     cout << "Pre iterations done, starting to improve best solution" << endl;
-    for (int i = 0; i < 30000000; i++) {
+    for (int i = 0; i < 300000000; i++) {
         if (best_score == 0)
             break;
         vector<int> schedule = best;
@@ -42,11 +42,6 @@ vector<int> ImprovedRandomSolver::solve() {
             schedule[randindex] = cur;
         }
 
-//        checker.schedule = schedule;
-//        for (int k = 0; k < schedule.size(); k++){
-//            cout << schedule[k] << " ";
-//        }
-//        cout << endl;
         checker.schedule = schedule;
         int score = checker.checkAll();
         if (score < best_score) {
@@ -59,5 +54,5 @@ vector<int> ImprovedRandomSolver::solve() {
             cout << "iteration " << i << ", result " << best_score << endl;
     }
     cout << "Iterations done " << endl;
-    return schedule;
+    return best;
 }
