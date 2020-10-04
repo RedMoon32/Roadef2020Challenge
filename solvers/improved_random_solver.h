@@ -2,10 +2,10 @@
 // Created by rinat on 9/15/2020.
 //
 
-#ifndef ROADEF2020CHALLENGE_ABSTRACT_SOLVER_H
-#define ROADEF2020CHALLENGE_ABSTRACT_SOLVER_H
+#ifndef ROADEF2020CHALLENGE_IMPROVED_RANDOM_SOLVER_H
+#define ROADEF2020CHALLENGE_IMPROVED_RANDOM_SOLVER_H
 
-#include "solver.h"
+#include "abstract_solver.h"
 #include "parser.h"
 
 class ImprovedRandomSolver: public AbstractSolver{
@@ -18,4 +18,4 @@ private:
 };
 
 
-#endif //ROADEF2020CHALLENGE_SOLVER_H
+#endif //ROADEF2020CHALLENGE_RANDOM_SOLVER_H

@@ -2,7 +2,7 @@
 // Created by rinat on 9/15/2020.
 //
 
-#include "improved_solver.h"
+#include "improved_random_solver.h"
 #include "checker.h"
 
 ImprovedRandomSolver::ImprovedRandomSolver(const DataInstance &data, int computationTime) :

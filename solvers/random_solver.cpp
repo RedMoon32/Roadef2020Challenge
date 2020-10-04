@@ -2,7 +2,7 @@
 // Created by rinat on 9/15/2020.
 //
 
-#include "solver.h"
+#include "random_solver.h"
 #include <fstream>
 
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions) {

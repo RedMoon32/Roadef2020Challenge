@@ -4,9 +4,9 @@
 
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-#include "../parser.h"
-#include "../catch.hpp"
-#include "../checker.h"
+#include "../parser/parser.h"
+#include "../libs/catch.hpp"
+#include "../checker/checker.h"
 #include <string>
 
 
@@ -14,7 +14,7 @@ Parser p;
 
 #define RESOURCES_STR
 
-TEST_CASE("Resources are parsed correctly", "[parser]") {
+TEST_CASE("Resources are parsed correctly", "[structs]") {
     p.data = "{\"Resources\": { \"c1\": { \"max\": [ 49, 23, 15 ], \"min\": [ 10, 0, 6 ] } }}"_json;
     vector<Resource> res = p.parseResources();
     REQUIRE(res.size() == 1);
@@ -23,7 +23,7 @@ TEST_CASE("Resources are parsed correctly", "[parser]") {
     REQUIRE(res[0].min == vector<int>{10, 0, 6});
 }
 
-TEST_CASE("Seasons are parsed correctly", "[parser]") {
+TEST_CASE("Seasons are parsed correctly", "[structs]") {
     p.data = "{\"Seasons\": { \"full\": [ 1, 2, 3 ] , \"winter\": [ 1, 3 ]}}"_json;
     vector<Season> res = p.parseSeasons();
     REQUIRE(res.size() == 2);
@@ -33,7 +33,7 @@ TEST_CASE("Seasons are parsed correctly", "[parser]") {
     REQUIRE(res[1].times == vector<int>{1, 3});
 }
 
-TEST_CASE("Interventions are parsed correctly", "[parser]") {
+TEST_CASE("Interventions are parsed correctly", "[structs]") {
     vector<Resource> resources = {{"c1", 0, {49, 23, 15}, {10, 0, 6}}};
     p.data = "{\"Interventions\": { \"I1\": { \"tmax\": 1, \"Delta\": [ 3, 3, 2 ], \"workload\": {\"c1\": { \"1\": { \"1\": 31 }, \"2\": { \"1\": 0 }, \"3\": { \"1\": 8 } }} }}}"_json;
     vector<Intervention> res = p.parseInterventions(resources);
@@ -57,7 +57,7 @@ TEST_CASE("Interventions are parsed correctly", "[parser]") {
     }
 }
 
-TEST_CASE("Exclusions are parsed correctly", "[parser]") {
+TEST_CASE("Exclusions are parsed correctly", "[structs]") {
     vector<Intervention> interventions = {Intervention(), Intervention(), Intervention()};
     vector<Season> seasons = {{"winter"},
                               {"full"}};
@@ -76,7 +76,7 @@ TEST_CASE("Exclusions are parsed correctly", "[parser]") {
     }
 }
 
-TEST_CASE("scenarious are parsed correctly", "[parser]") {
+TEST_CASE("scenarious are parsed correctly", "[structs]") {
     p.data = "{\"Scenarios_number\": [ 3, 1, 2 ] }"_json;
     vector<int> scenarious = p.parseScenarious();
     REQUIRE(scenarious.size() == 3);

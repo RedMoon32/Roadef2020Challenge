@@ -97,7 +97,7 @@ def compute_resources(Instance: dict):
         resources_usage[resource_name] = np.zeros(T_max)
     # Compute value for each resource and time step
     for intervention_name, intervention in Interventions.items():
-        # start time should be defined (already checked in scheduled constraint checker)
+        # start time should be defined (already checked in scheduled constraint checkers)
         if not START_STR in intervention:
             continue
         start_time = intervention[START_STR]
@@ -125,7 +125,7 @@ def compute_risk_distribution(Interventions: dict, T_max: int, scenario_numbers)
     for intervention in Interventions.values():
         # Retrieve Intervention's usefull infos
         intervention_risk = intervention[RISK_STR]
-        # start time should be defined (already checked in scheduled constraint checker)
+        # start time should be defined (already checked in scheduled constraint checkers)
         if not START_STR in intervention:
             continue
         start_time = intervention[START_STR]
@@ -285,7 +285,7 @@ def check_exclusions(Instance: dict):
         # Retrieve concerned interventions...
         intervention_1 = Interventions[intervention_1_name]
         intervention_2 = Interventions[intervention_2_name]
-        # start time should be defined (already checked in scheduled constraint checker)
+        # start time should be defined (already checked in scheduled constraint checkers)
         if (not START_STR in intervention_1) or (not START_STR in intervention_2):
             continue
         # ... their respective starting times...
@@ -336,7 +336,7 @@ def display_basic(Instance: dict, mean_risk, quantile):
 ######################
 
 def check_and_display(instance_file, solution_file):
-    """Control checker actions"""
+    """Control checkers actions"""
 
     # Read Instance
     instance = read_json(instance_file)

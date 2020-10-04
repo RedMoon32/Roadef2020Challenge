@@ -3392,7 +3392,7 @@ number_integer,   ///< number value (signed integer)
 number_unsigned,  ///< number value (unsigned integer)
 number_float,     ///< number value (floating-point)
 binary,           ///< binary array (ordered collection of bytes)
-discarded         ///< discarded by the parser callback function
+discarded         ///< discarded by the structs callback function
 };
 
 /*!
@@ -5203,7 +5203,7 @@ namespace nlohmann
 
 This class describes the SAX interface used by @ref nlohmann::json::sax_parse.
 Each function is called in different situations while the input is parsed. The
-boolean return value informs the parser whether to continue processing the
+boolean return value informs the structs whether to continue processing the
 input.
 */
 template<typename BasicJsonType>
@@ -5323,7 +5323,7 @@ namespace detail
 @brief SAX implementation to create a JSON value from SAX events
 
 This class implements the @ref json_sax interface and processes the SAX events
-to create a JSON value which makes it basically a DOM parser. The structure or
+to create a JSON value which makes it basically a DOM structs. The structure or
 hierarchy of the JSON value is managed by the stack `ref_stack` which contains
 a pointer to the respective array or object for each recursion depth.
 
@@ -5913,7 +5913,7 @@ template<typename BasicJsonType>
 class lexer_base
 {
 public:
-/// token types for the parser
+/// token types for the structs
 enum class token_type
 {
 uninitialized,    ///< indicating the scanner is uninitialized
@@ -7796,8 +7796,8 @@ private:
 //////////
 
 /*!
-    @brief Reads in a BSON-object and passes it to the SAX-parser.
-    @return whether a valid BSON-value was passed to the SAX parser
+    @brief Reads in a BSON-object and passes it to the SAX-structs.
+    @return whether a valid BSON-value was passed to the SAX structs
     */
 bool parse_bson_internal()
 {
@@ -7899,7 +7899,7 @@ return get_binary(input_format_t::bson, len, result);
     @warning Not all BSON element types are supported yet. An unsupported
              @a element_type will give rise to a parse_error.114:
              Unsupported BSON record type 0x...
-    @return whether a valid BSON-object/array was passed to the SAX parser
+    @return whether a valid BSON-object/array was passed to the SAX structs
     */
 bool parse_bson_element_internal(const char_int_type element_type,
 const std::size_t element_type_parse_position)
@@ -7977,7 +7977,7 @@ return sax->parse_error(element_type_parse_position, std::string(cr.data()), par
     @param[in] is_array Determines if the element list being read is to be
                         treated as an object (@a is_array == false), or as an
                         array (@a is_array == true).
-    @return whether a valid BSON-object/array was passed to the SAX parser
+    @return whether a valid BSON-object/array was passed to the SAX structs
     */
 bool parse_bson_element_list(const bool is_array)
 {
@@ -8014,8 +8014,8 @@ return true;
 }
 
 /*!
-    @brief Reads an array from the BSON input and passes it to the SAX-parser.
-    @return whether a valid BSON-array was passed to the SAX parser
+    @brief Reads an array from the BSON input and passes it to the SAX-structs.
+    @return whether a valid BSON-array was passed to the SAX structs
     */
 bool parse_bson_array()
 {
@@ -8045,7 +8045,7 @@ return sax->end_array();
                          be considered instead (false)
     @param[in] tag_handler how CBOR tags should be treated
 
-    @return whether a valid CBOR value was passed to the SAX parser
+    @return whether a valid CBOR value was passed to the SAX structs
     */
 bool parse_cbor_internal(const bool get_char,
 const cbor_tag_handler_t tag_handler)
@@ -8771,7 +8771,7 @@ return sax->end_object();
 /////////////
 
 /*!
-    @return whether a valid MessagePack value was passed to the SAX parser
+    @return whether a valid MessagePack value was passed to the SAX structs
     */
 bool parse_msgpack_internal()
 {
@@ -9403,7 +9403,7 @@ return sax->end_object();
                          input (true, default) or whether the last read
                          character should be considered instead
 
-    @return whether a valid UBJSON value was passed to the SAX parser
+    @return whether a valid UBJSON value was passed to the SAX structs
     */
 bool parse_ubjson_internal(const bool get_char = true)
 {
@@ -10100,7 +10100,7 @@ std::size_t chars_read = 0;
 /// whether we can assume little endianess
 const bool is_little_endian = little_endianess();
 
-/// the SAX parser
+/// the SAX structs
 json_sax_t* sax = nullptr;
 };
 }  // namespace detail
@@ -10110,7 +10110,7 @@ json_sax_t* sax = nullptr;
 
 // #include <nlohmann/detail/input/lexer.hpp>
 
-// #include <nlohmann/detail/input/parser.hpp>
+// #include <nlohmann/detail/input/structs.hpp>
 
 
 #include <cmath> // isfinite
@@ -10140,22 +10140,22 @@ namespace nlohmann
 namespace detail
 {
 ////////////
-// parser //
+// structs //
 ////////////
 
 enum class parse_event_t : uint8_t
 {
-/// the parser read `{` and started to process a JSON object
+/// the structs read `{` and started to process a JSON object
 object_start,
-/// the parser read `}` and finished processing a JSON object
+/// the structs read `}` and finished processing a JSON object
 object_end,
-/// the parser read `[` and started to process a JSON array
+/// the structs read `[` and started to process a JSON array
 array_start,
-/// the parser read `]` and finished processing a JSON array
+/// the structs read `]` and finished processing a JSON array
 array_end,
-/// the parser read a key of a value in an object
+/// the structs read a key of a value in an object
 key,
-/// the parser finished reading a JSON value
+/// the structs finished reading a JSON value
 value
 };
 
@@ -10166,7 +10166,7 @@ std::function<bool(int depth, parse_event_t event, BasicJsonType& parsed)>;
 /*!
 @brief syntax analysis
 
-This class implements a recursive descent parser.
+This class implements a recursive descent structs.
 */
 template<typename BasicJsonType, typename InputAdapterType>
 class parser
@@ -10179,7 +10179,7 @@ using lexer_t = lexer<BasicJsonType, InputAdapterType>;
 using token_type = typename lexer_t::token_type;
 
 public:
-/// a parser reading from an input adapter
+/// a structs reading from an input adapter
 explicit parser(InputAdapterType&& adapter,
 const parser_callback_t<BasicJsonType> cb = nullptr,
 const bool allow_exceptions_ = true,
@@ -10193,7 +10193,7 @@ get_token();
 }
 
 /*!
-    @brief public parser interface
+    @brief public structs interface
 
     @param[in] strict      whether to expect the last token to be EOF
     @param[in,out] result  parsed JSON value
@@ -17740,19 +17740,19 @@ JSON_ASSERT(m_type != value_t::binary || m_value.binary != nullptr);
 
 public:
 //////////////////////////
-// JSON parser callback //
+// JSON structs callback //
 //////////////////////////
 
 /*!
-    @brief parser event types
+    @brief structs event types
 
-    The parser callback distinguishes the following events:
-    - `object_start`: the parser read `{` and started to process a JSON object
-    - `key`: the parser read a key of a value in an object
-    - `object_end`: the parser read `}` and finished processing a JSON object
-    - `array_start`: the parser read `[` and started to process a JSON array
-    - `array_end`: the parser read `]` and finished processing a JSON array
-    - `value`: the parser finished reading a JSON value
+    The structs callback distinguishes the following events:
+    - `object_start`: the structs read `{` and started to process a JSON object
+    - `key`: the structs read a key of a value in an object
+    - `object_end`: the structs read `}` and finished processing a JSON object
+    - `array_start`: the structs read `[` and started to process a JSON array
+    - `array_end`: the structs read `]` and finished processing a JSON array
+    - `value`: the structs finished reading a JSON value
 
     @image html callback_events.png "Example when certain parse events are triggered"
 
@@ -17761,9 +17761,9 @@ public:
 using parse_event_t = detail::parse_event_t;
 
 /*!
-    @brief per-element parser callback type
+    @brief per-element structs callback type
 
-    With a parser callback function, the result of parsing a JSON text can be
+    With a structs callback function, the result of parsing a JSON text can be
     influenced. When passed to @ref parse, it is called on certain events
     (passed as @ref parse_event_t via parameter @a event) with a set recursion
     depth @a depth and context JSON value @a parsed. The return value of the
@@ -17776,19 +17776,19 @@ using parse_event_t = detail::parse_event_t;
 
     parameter @a event | description | parameter @a depth | parameter @a parsed
     ------------------ | ----------- | ------------------ | -------------------
-    parse_event_t::object_start | the parser read `{` and started to process a JSON object | depth of the parent of the JSON object | a JSON value with type discarded
-    parse_event_t::key | the parser read a key of a value in an object | depth of the currently parsed JSON object | a JSON string containing the key
-    parse_event_t::object_end | the parser read `}` and finished processing a JSON object | depth of the parent of the JSON object | the parsed JSON object
-    parse_event_t::array_start | the parser read `[` and started to process a JSON array | depth of the parent of the JSON array | a JSON value with type discarded
-    parse_event_t::array_end | the parser read `]` and finished processing a JSON array | depth of the parent of the JSON array | the parsed JSON array
-    parse_event_t::value | the parser finished reading a JSON value | depth of the value | the parsed JSON value
+    parse_event_t::object_start | the structs read `{` and started to process a JSON object | depth of the parent of the JSON object | a JSON value with type discarded
+    parse_event_t::key | the structs read a key of a value in an object | depth of the currently parsed JSON object | a JSON string containing the key
+    parse_event_t::object_end | the structs read `}` and finished processing a JSON object | depth of the parent of the JSON object | the parsed JSON object
+    parse_event_t::array_start | the structs read `[` and started to process a JSON array | depth of the parent of the JSON array | a JSON value with type discarded
+    parse_event_t::array_end | the structs read `]` and finished processing a JSON array | depth of the parent of the JSON array | the parsed JSON array
+    parse_event_t::value | the structs finished reading a JSON value | depth of the value | the parsed JSON value
 
     @image html callback_events.png "Example when certain parse events are triggered"
 
     Discarding a value (i.e., returning `false`) has different effects
     depending on the context in which function was called:
 
-    - Discarded values in structured types are skipped. That is, the parser
+    - Discarded values in structured types are skipped. That is, the structs
       will behave as if the discarded value was never read.
     - In case a value outside a structured type is skipped, it is replaced
       with `null`. This case happens if the top-level element is skipped.
@@ -23115,7 +23115,7 @@ return o << j;
       iterators.
 
     @param[in] i  input to read from
-    @param[in] cb  a parser callback function of type @ref parser_callback_t
+    @param[in] cb  a structs callback function of type @ref parser_callback_t
     which is used to control the deserialization by filtering unwanted values
     (optional)
     @param[in] allow_exceptions  whether to throw exceptions in case of a
@@ -23133,8 +23133,8 @@ return o << j;
     @throw parse_error.102 if to_unicode fails or surrogate error
     @throw parse_error.103 if to_unicode fails
 
-    @complexity Linear in the length of the input. The parser is a predictive
-    LL(1) parser. The complexity can be higher if the parser callback function
+    @complexity Linear in the length of the input. The structs is a predictive
+    LL(1) structs. The complexity can be higher if the structs callback function
     @a cb or reading from the input @a i has a super-linear complexity.
 
     @note A UTF-8 byte order mark is silently ignored.
@@ -23174,7 +23174,7 @@ return result;
 
     @param[in] first iterator to start of character range
     @param[in] last  iterator to end of character range
-    @param[in] cb  a parser callback function of type @ref parser_callback_t
+    @param[in] cb  a structs callback function of type @ref parser_callback_t
     which is used to control the deserialization by filtering unwanted values
     (optional)
     @param[in] allow_exceptions  whether to throw exceptions in case of a
@@ -23239,8 +23239,8 @@ return result;
 
     @return Whether the input read from @a i is valid JSON.
 
-    @complexity Linear in the length of the input. The parser is a predictive
-    LL(1) parser.
+    @complexity Linear in the length of the input. The structs is a predictive
+    LL(1) structs.
 
     @note A UTF-8 byte order mark is silently ignored.
 
@@ -23297,8 +23297,8 @@ return parser(i.get(), nullptr, false, ignore_comments).accept(true);
     @throw parse_error.102 if to_unicode fails or surrogate error
     @throw parse_error.103 if to_unicode fails
 
-    @complexity Linear in the length of the input. The parser is a predictive
-    LL(1) parser. The complexity can be higher if the SAX consumer @a sax has
+    @complexity Linear in the length of the input. The structs is a predictive
+    LL(1) structs. The complexity can be higher if the SAX consumer @a sax has
     a super-linear complexity.
 
     @note A UTF-8 byte order mark is silently ignored.
@@ -23375,8 +23375,8 @@ return operator>>(i, j);
     @throw parse_error.102 if to_unicode fails or surrogate error
     @throw parse_error.103 if to_unicode fails
 
-    @complexity Linear in the length of the input. The parser is a predictive
-    LL(1) parser.
+    @complexity Linear in the length of the input. The structs is a predictive
+    LL(1) structs.
 
     @note A UTF-8 byte order mark is silently ignored.
 
@@ -23384,7 +23384,7 @@ return operator>>(i, j);
     reading a serialization from a stream.,operator_deserialize}
 
     @sa parse(std::istream&, const parser_callback_t) for a variant with a
-    parser callback function to filter values while parsing
+    structs callback function to filter values while parsing
 
     @since version 1.0.0
     */

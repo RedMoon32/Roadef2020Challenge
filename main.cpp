@@ -3,7 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include "parser.h"
-#include "json.h"
+#include "json.hpp"
 
 using namespace std;
 using namespace nlohmann;

@@ -9667,13 +9667,13 @@ namespace detail {
     }
 } // namespace detail
 
-// A Combined parser
+// A Combined structs
 using detail::Parser;
 
-// A parser for options
+// A structs for options
 using detail::Opt;
 
-// A parser for arguments
+// A structs for arguments
 using detail::Arg;
 
 // Wrapper for argc, argv from main()
@@ -9682,13 +9682,13 @@ using detail::Args;
 // Specifies the name of the executable
 using detail::ExeName;
 
-// Convenience wrapper for option parser that specifies the help option
+// Convenience wrapper for option structs that specifies the help option
 using detail::Help;
 
 // enum of result types from a parse
 using detail::ParseResultType;
 
-// Result type for parser operation
+// Result type for structs operation
 using detail::ParserResult;
 
 }} // namespace Catch::clara

@@ -15,19 +15,16 @@ int Checker::checkAll() {
 
     int res1 = checkHorizon();
     if (res1 != 0) {
-        // cout << endl << "wrong horizon" << endl;
         return checkHorizon();
     }
 
     res1 = checkExclusions();
     if (res1 != 0) {
-        // cout << endl << "wrong exclusions " << endl;
         return 10000 * res1;
     }
 
     res1 = checkResourceConstraint();
     if (res1 != 0) {
-        // cout << endl << "wrong resources" << endl;
         return res1;
     }
 
@@ -44,7 +41,7 @@ int Checker::checkResourceConstraint() {
             if (res.second.size() >= time)
                 for (int tsht = 0; tsht < res.second[time].size(); tsht++) {
                     auto &target = resource_consumption[res.first.id][tsht];
-                    if (time < res.second.size() && tsht < res.second[time].size())
+                    if (tsht < res.second[time].size())
                         target += res.second[time][tsht];
                     if (target > data.resources[res.first.id].max[time])
                         wrong_res += 1;

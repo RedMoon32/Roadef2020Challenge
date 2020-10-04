@@ -3,16 +3,21 @@ project(Roadef2020Challenge)
 
 set(CMAKE_CXX_STANDARD 14)
 
+include_directories(checkers structs solvers tests libs)
+
 set(SOURCE_FILES
-        parser.h
-        json.h
-        parser.cpp
-        checker.cpp
-        checker.h
-        solver.cpp
-        solver.h
-        improved_solver.cpp
-        improved_solver.h)
+        structs/parser.h
+        libs/json.hpp
+        structs/parser.cpp
+        checkers/checker.cpp
+        checkers/checker.h
+        checkers/partial_checker.cpp
+        checkers/partial_checker.h
+        solvers/random_solver.cpp
+        solvers/random_solver.h
+        solvers/improved_random_solver.cpp
+        solvers/improved_random_solver.h solvers/abstract_solver.h
+        )
 
 #add_executable(Roadef2020Challenge
 #        main.cpp
@@ -20,8 +25,8 @@ set(SOURCE_FILES
 #        )
 
 add_executable(CheckerBenchmark
-        checker_benchmark.cpp
-        ${SOURCE_FILES})
+        checkers/checker_benchmark.cpp
+        ${SOURCE_FILES} )
 
 
 add_executable(Tests

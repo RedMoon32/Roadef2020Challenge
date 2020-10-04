@@ -2,17 +2,12 @@
 // Created by rinat on 9/15/2020.
 //
 
-#ifndef ROADEF2020CHALLENGE_SOLVER_H
-#define ROADEF2020CHALLENGE_SOLVER_H
+#ifndef ROADEF2020CHALLENGE_RANDOM_SOLVER_H
+#define ROADEF2020CHALLENGE_RANDOM_SOLVER_H
 
 #include "parser.h"
+#include "abstract_solver.h"
 
-class AbstractSolver {
-public:
-
-    virtual vector<int> solve() = 0;
-
-};
 
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);
 
@@ -26,4 +21,4 @@ private:
 };
 
 
-#endif //ROADEF2020CHALLENGE_SOLVER_H
+#endif //ROADEF2020CHALLENGE_RANDOM_SOLVER_H
