@@ -37,15 +37,18 @@ int Checker::checkResourceConstraint() {
 
     for (int inter = 0; inter < schedule.size(); inter++) {
         int time = schedule[inter];
-        for (const auto &res: data.interventions[inter].workload) {
-            if (res.second.size() >= time)
+        for (const pair<Resource , vector<vector<float>>> &res: data.interventions[inter].workload) {
+            // bag - 176 time set for intervention 12 while workload for this intervention at this time is max 175 in 06.json
+            if (res.second.size() > time)
+            {
                 for (int tsht = 0; tsht < res.second[time].size(); tsht++) {
-                    auto &target = resource_consumption[res.first.id][tsht];
+                    float &target = resource_consumption[res.first.id][tsht];
                     if (tsht < res.second[time].size())
                         target += res.second[time][tsht];
                     if (target > data.resources[res.first.id].max[time])
                         wrong_res += 1;
                 }
+            }
         }
     }
 

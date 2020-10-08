@@ -8,6 +8,8 @@
 #include "abstract_solver.h"
 #include "parser.h"
 
+extern vector<int> best_solution;
+
 class ImprovedRandomSolver: public AbstractSolver{
 public:
     ImprovedRandomSolver(const DataInstance &data, int computationTime);

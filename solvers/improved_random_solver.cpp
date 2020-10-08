@@ -5,6 +5,8 @@
 #include "improved_random_solver.h"
 #include "checker.h"
 
+vector<int> best_solution;
+
 ImprovedRandomSolver::ImprovedRandomSolver(const DataInstance &data, int computationTime) :
         data(data),
         computationTime(computationTime) {
@@ -12,7 +14,7 @@ ImprovedRandomSolver::ImprovedRandomSolver(const DataInstance &data, int computa
 
 vector<int> ImprovedRandomSolver::solve() {
     vector<int> schedule(data.interventions.size());
-    vector<int> best;
+    vector<int> &best = best_solution;
     int best_score = 999999999;
     Checker checker({}, data);
 

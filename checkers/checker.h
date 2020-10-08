@@ -6,19 +6,7 @@
 #define ROADEF2020CHALLENGE_CHECKER_H
 
 #include "parser.h"
-
-class AbstractChecker {
-public:
-
-    virtual int checkAll() = 0;
-
-    virtual int checkResourceConstraint() = 0;
-
-    virtual int checkHorizon() = 0;
-
-    virtual int checkExclusions() = 0;
-
-};
+#include "abstract_checker.h"
 
 class Checker : public AbstractChecker {
 public:
