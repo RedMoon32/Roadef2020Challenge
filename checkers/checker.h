@@ -20,6 +20,11 @@ public:
 
     int checkExclusions() override;
 
+    vector<vector<double>> computeRiskDistribution();
+    vector<double> computeMeanRisk(const vector<vector<double>> &risk);
+    vector<double> computeQuantile(vector<vector<double>> &risk);
+    double computeMetric();
+
     vector<int> schedule;
     vector<vector<float>> resource_consumption;
     const DataInstance &data;

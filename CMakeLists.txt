@@ -17,12 +17,12 @@ set(SOURCE_FILES
         solvers/random_solver.h
         solvers/improved_random_solver.cpp
         solvers/improved_random_solver.h solvers/abstract_solver.h
-        structs/structs.h)
+        structs/structs.h checkers/abstract_checker.h)
 
-#add_executable(Roadef2020Challenge
-#        main.cpp
-#        ${SOURCE_FILES}
-#        )
+add_executable(Roadef2020Challenge
+        main.cpp
+        ${SOURCE_FILES}
+        )
 
 add_executable(CheckerBenchmark
         checkers/checker_benchmark.cpp

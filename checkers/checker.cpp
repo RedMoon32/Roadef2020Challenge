@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include <algorithm>
+  #include <algorithm>
 #include "checker.h"
 
 
@@ -37,17 +37,14 @@ int Checker::checkResourceConstraint() {
 
     for (int inter = 0; inter < schedule.size(); inter++) {
         int time = schedule[inter];
-        for (const pair<Resource , vector<vector<float>>> &res: data.interventions[inter].workload) {
+        for (auto &res: data.interventions[inter].workload) {
             // bag - 176 time set for intervention 12 while workload for this intervention at this time is max 175 in 06.json
-            if (res.second.size() > time)
-            {
-                for (int tsht = 0; tsht < res.second[time].size(); tsht++) {
-                    float &target = resource_consumption[res.first.id][tsht];
-                    if (tsht < res.second[time].size())
-                        target += res.second[time][tsht];
-                    if (target > data.resources[res.first.id].max[time])
-                        wrong_res += 1;
-                }
+            for (int tsht = 0; tsht < res.second[time].size(); tsht++) {
+                float &target = resource_consumption[res.first.id][tsht];
+                if (tsht < res.second[time].size())
+                    target += res.second[time][tsht];
+                if (target > data.resources[res.first.id].max[time])
+                    wrong_res += 1;
             }
         }
     }
@@ -66,7 +63,7 @@ int Checker::checkHorizon() {
     int wrong = 0;
     for (int inter = 0; inter < schedule.size(); inter++) {
         int time = schedule[inter];
-        if (time >= data.interventions[inter].tmax)
+        if (time > data.interventions[inter].tmax)
             wrong++;
     }
     return wrong;
@@ -88,4 +85,58 @@ int Checker::checkExclusions() {
 Checker::Checker(vector<int> schedule, const DataInstance &data) :
         data(data), schedule(schedule) {
     resource_consumption = vector<vector<float>>(data.resources.size(), vector<float>(data.T));
+}
+
+vector<vector<double>> Checker::computeRiskDistribution(){
+    vector<vector<double>> risk;
+    for (int t = 0; t < data.T; t++){
+        risk.push_back(vector<double>(data.scenarious_number[t]));
+    }
+    for (int i = 0; i < schedule.size(); i++){
+        auto intervention = data.interventions[i];
+        int start_time = schedule[i];
+        int delta = intervention.delta[start_time];
+        for (int time = start_time; time  < start_time + delta; time++){
+            auto cur_risk = intervention.risk[time][start_time];
+            for (int risk_index = 0; risk_index < cur_risk.size(); risk_index++){
+                risk[time][risk_index] += cur_risk[risk_index];
+            }
+        }
+    }
+    return risk;
+}
+
+vector<double> Checker::computeMeanRisk(const vector<vector<double>> &risk){
+    vector<double> mean_risk(data.T);
+    for (int t = 0; t < data.T; t++) {
+        double sum_of_elements = 0;
+        for (auto &n : risk[t])
+            sum_of_elements += n;
+        mean_risk[t] = sum_of_elements / data.scenarious_number[data.T];
+    }
+    return mean_risk;
+}
+
+vector<double> Checker::computeQuantile(vector<vector<double>> &risk){
+    vector<double> q(data.T);
+    for (int t = 0; t < data.T; t++){
+        sort(risk[t].begin(), risk[t].end());
+        q[t] = risk[t][int(ceil(data.scenarious_number[t] * data.Quantile))-1];
+    }
+    return q;
+}
+
+
+double Checker::computeMetric(){
+    auto risk = computeRiskDistribution();
+    auto mean_risk = computeMeanRisk(risk);
+    auto q = computeQuantile(risk);
+    double  obj_1 = accumulate( mean_risk.begin(), mean_risk.end(), 0.0)/mean_risk.size();
+    double sum = 0;
+    for (int i = 0 ; i < q.size(); i++){
+        sum += max(q[i] - mean_risk[i], 0.);
+    }
+    double obj_2 = sum/(double)q.size();
+    double obj_total = data.Alpha  * obj_1 + (1-data.Alpha)*obj_2;
+    return obj_total;
 }

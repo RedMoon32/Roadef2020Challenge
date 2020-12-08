@@ -4,11 +4,10 @@
 
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-#include "../parser/parser.h"
-#include "../libs/catch.hpp"
-#include "../checker/checker.h"
 #include <string>
-
+#include <parser.h>
+#include <catch.hpp>
+#include <checker.h>
 
 Parser p;
 
@@ -19,8 +18,8 @@ TEST_CASE("Resources are parsed correctly", "[structs]") {
     vector<Resource> res = p.parseResources();
     REQUIRE(res.size() == 1);
     REQUIRE(res[0].name == "c1");
-    REQUIRE(res[0].max == vector<int>{49, 23, 15});
-    REQUIRE(res[0].min == vector<int>{10, 0, 6});
+    REQUIRE(res[0].max == vector<float>{49, 23, 15});
+    REQUIRE(res[0].min == vector<float>{10, 0, 6});
 }
 
 TEST_CASE("Seasons are parsed correctly", "[structs]") {
@@ -35,7 +34,7 @@ TEST_CASE("Seasons are parsed correctly", "[structs]") {
 
 TEST_CASE("Interventions are parsed correctly", "[structs]") {
     vector<Resource> resources = {{"c1", 0, {49, 23, 15}, {10, 0, 6}}};
-    p.data = "{\"Interventions\": { \"I1\": { \"tmax\": 1, \"Delta\": [ 3, 3, 2 ], \"workload\": {\"c1\": { \"1\": { \"1\": 31 }, \"2\": { \"1\": 0 }, \"3\": { \"1\": 8 } }} }}}"_json;
+    p.data = "{\"Interventions\": { \"I1\": { \"tmax\": \"1\", \"Delta\": [ 3, 3, 2 ], \"workload\": {\"c1\": { \"1\": { \"1\": 31 }, \"2\": { \"1\": 0 }, \"3\": { \"1\": 8 } }} }}}"_json;
     vector<Intervention> res = p.parseInterventions(resources);
     REQUIRE(res.size() == 1);
     auto i1 = res[0];
@@ -51,7 +50,7 @@ TEST_CASE("Interventions are parsed correctly", "[structs]") {
         REQUIRE(i1.workload.size() == 1);
         auto w1 = i1.workload[0];
         REQUIRE(w1.first.name == "c1");
-        REQUIRE(w1.second == vector<vector<int>>{{31},
+        REQUIRE(w1.second == vector<vector<double>>{{31},
                                                  {0},
                                                  {8}});
     }
@@ -99,15 +98,11 @@ TEST_CASE("Resource consumption is correct") {
     vector<Resource> resources = {{"c1", 0, {20, 30, 30}, {10, 20, 20}},
                                   {"c2", 1, {10, 20, 20}, {10, 0,  10}}};
 
-    workloadVec workload1{pair<Resource &, vector<vector<int>>>(resources[0], vector<vector<int>>{{10,},
-                                                                                                  {10, 30,},
-                                                                                                  {20, 10, 10}})};
+    workloadVec workload1{{resources[0], {{10,}, {10, 30,}, {20, 10, 10}}}};
 
-    workloadVec workload2{pair<Resource &, vector<vector<int>>>(resources[1], vector<vector<int>>{{0,},
-                                                                                                  {10, 20,},})};
+    workloadVec workload2{{resources[1], {{0,}, {10, 20,},}}};
 
-    workloadVec workload3{pair<Resource &, vector<vector<int>>>(resources[1], vector<vector<int>>{{0,  0, 10},
-                                                                                                  {10, 20,},})};
+    workloadVec workload3{{resources[1], {{0,  0, 10},{10, 20,},}}};
 
     Intervention int1 = {.workload = workload1};
     Intervention int2 = {.workload = workload2};
@@ -129,8 +124,8 @@ TEST_CASE("Exclusions are correct") {
     Season s1 =  {.name = "first", .times=vector<int>{0, 1}};
     Season s2 =  {.name = "second", .times=vector<int>{2}};
 
-    Exclusion exc1 = {.id = 0, .int1 = int1, .int2 = int2, s1};
-    Exclusion exc2 = {.id = 1, .int1 = int2, .int2 = int3, s2};
+    Exclusion exc1 = {.id = 0, .int1 = int1, .int2 = int2, .season = s1};
+    Exclusion exc2 = {.id = 1, .int1 = int2, .int2 = int3, .season = s2};
     vector<Exclusion> exclusions = {exc1, exc2};
 
     DataInstance d{.exclusions = exclusions};
@@ -146,5 +141,6 @@ TEST_CASE("Exclusions are correct") {
     c.schedule = vector<int> {0, 2, 2};
     res = c.checkExclusions();
     REQUIRE(res == 1);
-
 }
+
+

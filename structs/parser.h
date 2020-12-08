@@ -30,13 +30,16 @@ public:
 
     vector<int> parseScenarious();
 
-    vector<pair<Resource , vector<vector<float>>>> parseWorkload(vector<Resource> resources, const json &intervention);
+    workloadVec parseWorkload(vector<Resource> resources, const json &intervention);
+
+    vector<vector<vector<double>>> parseRisk(const json &intervention);
 
     vector<float> parseArray(const json &j);
 
     vector<int> parseIntArray(const json &j);
 
     json data;
+
 };
 
 #endif

@@ -27,6 +27,8 @@ using namespace nlohmann;
 map<string, int> resource_name_mapper;
 map<string, int> intervention_name_mapper;
 
+typedef vector<double> dvect;
+
 vector<Resource> Parser::parseResources() {
     vector<Resource> resources;
     int id = 0;
@@ -54,9 +56,9 @@ vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
     int id = 0;
     for (auto &intr : this->data[INTERVENTIONS].items()) {
         auto cur = intr.value();
-        int tmax = stoi(cur["tmax"].get<std::string>());
         vector<int> delta = parseIntArray(cur["Delta"]);
-        vector<pair<Resource, vector<vector<float>>>> workload = parseWorkload(resources, cur);
+        int tmax = stoi(cur["tmax"].get<std::string>());
+        auto workload = parseWorkload(resources, cur);
         intervention_name_mapper[intr.key()] = id;
         interventions.push_back({intr.key(), id, tmax, delta, workload});
         id += 1;
@@ -102,14 +104,32 @@ vector<float> Parser::parseArray(const json &j) {
     return nums;
 }
 
-vector<pair<Resource , vector<vector<float>>>>
-Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
-    vector<pair<Resource , vector<vector<float>>>> workloads;
+vector<vector<vector<double>>> Parser::parseRisk(const json &intervention){
+    vector<vector<vector<double>>> risk_vec;
+    // parse risk (iterate over el.value().items()
+    for (auto &risk : intervention[RISK].items()) {
+        vector<vector<double>> first;
+        for (auto &t: risk.value().items()) {
+            vector<double> second;
+            for (auto &tsht: t.value().items()) {
+                for (auto& element : tsht.value().items()) {
+                    second.push_back((double)element.value());
+                }
+            }
+            first.push_back(second);
+        }
+        risk_vec.push_back(first);
+    }
+    return risk_vec;
+}
+
+workloadVec Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
+    workloadVec workloads;
     // parse workload (iterate over el.value().items()
-    for (auto &workload : intervention["workload"].items()) {
-        vector<vector<float>> first;
+    for (auto &workload : intervention[RESOURCE_CHARGE].items()) {
+        vector<vector<double>> first;
         for (auto &t: workload.value().items()) {
-            vector<float> second;
+            vector<double> second;
             for (auto &tsht: t.value().items()) {
                 second.push_back(tsht.value());
             }
@@ -117,8 +137,7 @@ Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
         }
         string name = workload.key();
         int id = resource_name_mapper[name];
-        workloads.push_back(
-                pair<Resource , vector<vector<float>>>(resources[id], first));
+        workloads.push_back({resources[id], first});
     }
     return workloads;
 }

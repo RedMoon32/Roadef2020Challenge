@@ -36,7 +36,7 @@ int main() {
     signal(SIGALRM, catchAlarm);
     alarm(EXECUITON_TIME_SEC);
 
-    Parser p("../A_set/A_06.json");
+    Parser p("../A_set/A_09.json");
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
     ImprovedRandomSolver solver(d, -1);
