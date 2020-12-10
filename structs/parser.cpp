@@ -6,8 +6,6 @@
 #include <utility>
 #include <map>
 
-using namespace nlohmann;
-
 #define RESOURCES "Resources"
 #define SEASONS "Seasons"
 #define INTERVENTIONS "Interventions"
@@ -54,13 +52,14 @@ vector<Season> Parser::parseSeasons() {
 vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
     vector<Intervention> interventions;
     int id = 0;
-    for (auto &intr : this->data[INTERVENTIONS].items()) {
-        auto cur = intr.value();
+    for (auto &intervention : this->data[INTERVENTIONS].items()) {
+        auto cur = intervention.value();
         vector<int> delta = parseIntArray(cur["Delta"]);
-        int tmax = stoi(cur["tmax"].get<std::string>());
-        auto workload = parseWorkload(resources, cur);
-        intervention_name_mapper[intr.key()] = id;
-        interventions.push_back({intr.key(), id, tmax, delta, workload});
+        int tmax = stoi(cur["tmax"].get<std::string>())-1;
+        auto workload = parseWorkload(resources, cur, tmax);
+        auto risk = parseRisk(cur);
+        intervention_name_mapper[intervention.key()] = id;
+        interventions.push_back({intervention.key(), id, tmax, delta, workload, risk});
         id += 1;
     }
     return interventions;
@@ -123,21 +122,20 @@ vector<vector<vector<double>>> Parser::parseRisk(const json &intervention){
     return risk_vec;
 }
 
-workloadVec Parser::parseWorkload(vector<Resource> resources, const json &intervention) {
+workloadVec Parser::parseWorkload(vector<Resource> resources, const json &intervention, int tmax) {
     workloadVec workloads;
     // parse workload (iterate over el.value().items()
     for (auto &workload : intervention[RESOURCE_CHARGE].items()) {
-        vector<vector<double>> first;
+        vector<vector<double>> workload_by_start_time(tmax+1);
         for (auto &t: workload.value().items()) {
             vector<double> second;
             for (auto &tsht: t.value().items()) {
-                second.push_back(tsht.value());
+                workload_by_start_time[stoi(tsht.key())-1].push_back(tsht.value());
             }
-            first.push_back(second);
         }
         string name = workload.key();
         int id = resource_name_mapper[name];
-        workloads.push_back({resources[id], first});
+        workloads.push_back({resources[id], workload_by_start_time});
     }
     return workloads;
 }

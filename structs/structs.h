@@ -33,7 +33,7 @@ struct Intervention {
     int tmax;
     vector<int> delta;
     workloadVec workload;
-    vector<vector<vector<float>>> risk;
+    vector<vector<vector<double>>> risk;
 };
 
 struct Exclusion {

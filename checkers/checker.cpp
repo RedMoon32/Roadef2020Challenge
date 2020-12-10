@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-  #include <algorithm>
+#include <algorithm>
 #include "checker.h"
 
 
@@ -15,12 +15,12 @@ int Checker::checkAll() {
 
     int res1 = checkHorizon();
     if (res1 != 0) {
-        return checkHorizon();
+        return -checkHorizon();
     }
 
     res1 = checkExclusions();
     if (res1 != 0) {
-        return 10000 * res1;
+        return -10000 * res1;
     }
 
     res1 = checkResourceConstraint();
@@ -36,22 +36,20 @@ int Checker::checkResourceConstraint() {
     int wrong_res = 0;
 
     for (int inter = 0; inter < schedule.size(); inter++) {
-        int time = schedule[inter];
-        for (auto &res: data.interventions[inter].workload) {
-            // bag - 176 time set for intervention 12 while workload for this intervention at this time is max 175 in 06.json
-            for (int tsht = 0; tsht < res.second[time].size(); tsht++) {
-                float &target = resource_consumption[res.first.id][tsht];
-                if (tsht < res.second[time].size())
-                    target += res.second[time][tsht];
-                if (target > data.resources[res.first.id].max[time])
-                    wrong_res += 1;
+        int start_time = schedule[inter];
+        auto cur_job = data.interventions[inter];
+        for (auto &res: cur_job.workload) {
+            for (int tsht = 0; tsht < res.second[start_time].size(); tsht++) {
+                float &target = resource_consumption[res.first.id][tsht+start_time];
+                target += res.second[start_time][tsht];
             }
         }
     }
 
     for (int res = 0; res < resource_consumption.size(); res++) {
         for (int time = 0; time < data.T; time++) {
-            if (resource_consumption[res][time] < data.resources[res].min[time])
+            if (resource_consumption[res][time] < data.resources[res].min[time]|
+                resource_consumption[res][time] > data.resources[res].max[time])
                 wrong_res += 1;
             resource_consumption[res][time] = 0;
         }
@@ -96,8 +94,10 @@ vector<vector<double>> Checker::computeRiskDistribution(){
         auto intervention = data.interventions[i];
         int start_time = schedule[i];
         int delta = intervention.delta[start_time];
-        for (int time = start_time; time  < start_time + delta; time++){
-            auto cur_risk = intervention.risk[time][start_time];
+        for (int time_idx = 0; time_idx < delta; time_idx++){
+            auto time = time_idx + start_time;
+            auto idex = min(time, intervention.tmax)-start_time;
+            vector<double> cur_risk = intervention.risk[time][idex];
             for (int risk_index = 0; risk_index < cur_risk.size(); risk_index++){
                 risk[time][risk_index] += cur_risk[risk_index];
             }

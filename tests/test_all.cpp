@@ -11,7 +11,6 @@
 
 Parser p;
 
-#define RESOURCES_STR
 
 TEST_CASE("Resources are parsed correctly", "[structs]") {
     p.data = "{\"Resources\": { \"c1\": { \"max\": [ 49, 23, 15 ], \"min\": [ 10, 0, 6 ] } }}"_json;
@@ -46,13 +45,10 @@ TEST_CASE("Interventions are parsed correctly", "[structs]") {
         REQUIRE(i1.delta == vector<int>{3, 3, 2});
 
     }SECTION(" Workload parsed correctly") {
-
         REQUIRE(i1.workload.size() == 1);
         auto w1 = i1.workload[0];
         REQUIRE(w1.first.name == "c1");
-        REQUIRE(w1.second == vector<vector<double>>{{31},
-                                                 {0},
-                                                 {8}});
+        REQUIRE(w1.second == vector<vector<double>>{{31, 0, 8}});
     }
 }
 
@@ -94,26 +90,43 @@ TEST_CASE("Time horizon is correct") {
     REQUIRE(c.checkHorizon() == 2);
 }
 
+TEST_CASE("Risk distribution is parsed correctly") {
+    p.data = "{\"risk\":{ \"1\":{ \"1\":[ 1.1, 2.2, 3.3, 4.4, 5.5, 6.6 ]}, \"2\":{ \"1\":[ 1.11, 2.22, 3.33], \"2\":[ 1.2, 2.74, 3.94, 4.58, 5.62, 6.39, 7.7 ]}}}"_json;
+    vector<vector<vector<double>>> risk = p.parseRisk(p.data);
+    REQUIRE(risk.size() == 2);
+    REQUIRE(risk[0].size() == 1);
+    REQUIRE((risk[0][0].size() == 6 && risk[1][0].size() == 3 && risk[1][1].size() == 7));
+    REQUIRE(risk[1][0] == vector<double>{1.11, 2.22, 3.33});
+}
+
 TEST_CASE("Resource consumption is correct") {
     vector<Resource> resources = {{"c1", 0, {20, 30, 30}, {10, 20, 20}},
                                   {"c2", 1, {10, 20, 20}, {10, 0,  10}}};
 
-    workloadVec workload1{{resources[0], {{10,}, {10, 30,}, {20, 10, 10}}}};
+    workloadVec workload1{{resources[0], {{20, 20, 20}, {5, 5}, {10, 10}}}};
 
-    workloadVec workload2{{resources[1], {{0,}, {10, 20,},}}};
+    workloadVec workload2{{resources[1], {{10, 10,}, {5, 9}, {10, 10}}}};
 
-    workloadVec workload3{{resources[1], {{0,  0, 10},{10, 20,},}}};
+    workloadVec workload3{{resources[1], {{5}, {1}, {2}}}};
 
-    Intervention int1 = {.workload = workload1};
-    Intervention int2 = {.workload = workload2};
-    Intervention int3 = {.workload = workload3};
+    Intervention int1 = {.delta = {3, 2, 2}, .workload = workload1};
+    Intervention int2 = {.delta = {2, 2, 2}, .workload = workload2};
+    Intervention int3 = {.delta = {1, 1, 1}, .workload = workload3};
     vector<Intervention> interventions = {int1, int2, int3};
 
-    DataInstance d{.T = 3, .interventions = interventions, .resources = resources, };
-    Checker c(vector<int>{0, 1, 1}, d);
+    DataInstance d{.T = 3, .interventions = interventions, .resources = resources,};
 
-    int res = c.checkResourceConstraint();
-    REQUIRE(res == 4);
+    SECTION("First slot") {
+        Checker c(vector<int>{0, 0, 0}, d);
+        int res = c.checkResourceConstraint();
+        REQUIRE(res == 2);
+    }
+
+    SECTION("Second slot") {
+        Checker c(vector<int>{0, 1, 1}, d);
+        int res = c.checkResourceConstraint();
+        REQUIRE(res == 2);
+    }
 }
 
 TEST_CASE("Exclusions are correct") {
@@ -121,8 +134,8 @@ TEST_CASE("Exclusions are correct") {
     Intervention int2 = {.id = 1};
     Intervention int3 = {.id = 2};
 
-    Season s1 =  {.name = "first", .times=vector<int>{0, 1}};
-    Season s2 =  {.name = "second", .times=vector<int>{2}};
+    Season s1 = {.name = "first", .times=vector<int>{0, 1}};
+    Season s2 = {.name = "second", .times=vector<int>{2}};
 
     Exclusion exc1 = {.id = 0, .int1 = int1, .int2 = int2, .season = s1};
     Exclusion exc2 = {.id = 1, .int1 = int2, .int2 = int3, .season = s2};
@@ -134,13 +147,20 @@ TEST_CASE("Exclusions are correct") {
     int res = c.checkExclusions();
     REQUIRE(res == 1);
 
-    c.schedule = vector<int> {2, 0, 0};
+    c.schedule = vector<int>{2, 0, 0};
     res = c.checkExclusions();
     REQUIRE(res == 0);
 
-    c.schedule = vector<int> {0, 2, 2};
+    c.schedule = vector<int>{0, 2, 2};
     res = c.checkExclusions();
     REQUIRE(res == 1);
 }
 
-
+TEST_CASE("Objective function is computed correctly"){
+    Parser parser("../A_set/A_09.json");
+    auto d = parser.parseJsonToSchedule();
+    vector<int> schedule(d.interventions.size());
+    Checker c(schedule, d);
+    double res = c.computeMetric();
+    cout << "done" << endl;
+}
