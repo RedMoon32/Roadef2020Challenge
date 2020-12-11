@@ -12,6 +12,8 @@
 
 using namespace std;
 
+typedef vector<pair<int, vector<vector<double>>>> riskVector;
+
 struct Resource {
     string name;
     int id;
@@ -33,7 +35,7 @@ struct Intervention {
     int tmax;
     vector<int> delta;
     workloadVec workload;
-    vector<vector<vector<double>>> risk;
+    riskVector risk;
 };
 
 struct Exclusion {

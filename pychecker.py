@@ -8,7 +8,6 @@ import sys
 import numpy as np
 import json
 
-
 ####################
 ### Utils ##########
 ####################
@@ -32,6 +31,7 @@ START_STR = 'start'
 QUANTILE_STR = "Quantile"
 ALPHA_STR = "Alpha"
 
+
 ## Json reader
 def read_json(filename: str):
     """Read a json file and return data as a dict object"""
@@ -43,6 +43,7 @@ def read_json(filename: str):
     print('Done')
 
     return Instance
+
 
 ## Txt Solution reader
 def read_solution_from_txt(Instance: dict, solution_filename: str):
@@ -60,18 +61,21 @@ def read_solution_from_txt(Instance: dict, solution_filename: str):
         start_time_str = tmp[1].split('\n')[0]
         # Assert Intervention exists
         if not intervention_name in Interventions:
-            print('ERROR: Unexpected Intervention ' + intervention_name + ' in solution file ' + solution_filename + '.')
+            print(
+                'ERROR: Unexpected Intervention ' + intervention_name + ' in solution file ' + solution_filename + '.')
             continue
         # Assert starting date is an integer
         start_time: int
         try:
             start_time = int(start_time_str)
         except ValueError:
-            print('ERROR: Unexpected starting time ' + start_time_str + ' for Intervention ' + intervention_name + '. Expect integer value.')
+            print(
+                'ERROR: Unexpected starting time ' + start_time_str + ' for Intervention ' + intervention_name + '. Expect integer value.')
             continue
         # Assert no duplicate
         if START_STR in Interventions[intervention_name]:
-            print('ERROR: Duplicate entry for Intervention ' + intervention_name + '. Only first read value is being considered.')
+            print(
+                'ERROR: Duplicate entry for Intervention ' + intervention_name + '. Only first read value is being considered.')
             continue
         # Store starting time
         Interventions[intervention_name][START_STR] = start_time
@@ -101,15 +105,17 @@ def compute_resources(Instance: dict):
         if not START_STR in intervention:
             continue
         start_time = intervention[START_STR]
-        start_time_idx = start_time - 1 #index of list starts at 0
+        start_time_idx = start_time - 1  # index of list starts at 0
         intervention_worload = intervention[RESOURCE_CHARGE_STR]
         intervention_delta = int(intervention[DELTA_STR][start_time_idx])
         # compute effective worload
         for resource_name, intervention_resource_worload in intervention_worload.items():
             for time in range(start_time_idx, start_time_idx + intervention_delta):
                 # null values are not available
-                if str(time+1) in intervention_resource_worload and str(start_time) in intervention_resource_worload[str(time+1)]:
-                    resources_usage[resource_name][time] += intervention_resource_worload[str(time+1)][str(start_time)]
+                if str(time + 1) in intervention_resource_worload and str(start_time) in intervention_resource_worload[
+                    str(time + 1)]:
+                    resources_usage[resource_name][time] += intervention_resource_worload[str(time + 1)][
+                        str(start_time)]
 
     return resources_usage
 
@@ -122,6 +128,8 @@ def compute_risk_distribution(Interventions: dict, T_max: int, scenario_numbers)
     # Init risk table
     risk = [scenario_numbers[t] * [0] for t in range(T_max)]
     # Compute for each intervention independently
+    int_id = 0
+    intervention: object
     for intervention in Interventions.values():
         # Retrieve Intervention's usefull infos
         intervention_risk = intervention[RISK_STR]
@@ -129,14 +137,17 @@ def compute_risk_distribution(Interventions: dict, T_max: int, scenario_numbers)
         if not START_STR in intervention:
             continue
         start_time = intervention[START_STR]
-        start_time_idx = int(start_time) - 1 # index for list getter
+        start_time_idx = int(start_time) - 1  # index for list getter
         delta = int(intervention[DELTA_STR][start_time_idx])
         for time in range(start_time_idx, start_time_idx + delta):
             for i, additional_risk in enumerate(intervention_risk[str(time + 1)][str(start_time)]):
+                #print(int_id, ' ', time, ' ', i, '+', additional_risk)
                 risk[time][i] += additional_risk
+        int_id += 1
     print('\tDone')
 
     return risk
+
 
 ## Compute mean for each period
 def compute_mean_risk(risk, T_max: int, scenario_numbers):
@@ -152,6 +163,7 @@ def compute_mean_risk(risk, T_max: int, scenario_numbers):
 
     return mean_risk
 
+
 ## Compute quantile for each period
 def compute_quantile(risk, T_max: int, scenario_numbers, quantile):
     """Compute Quantile values over each time period"""
@@ -161,10 +173,11 @@ def compute_quantile(risk, T_max: int, scenario_numbers, quantile):
     q = np.zeros(T_max)
     for t in range(T_max):
         risk[t].sort()
-        q[t] = risk[t][int(np.ceil(scenario_numbers[t] * quantile))-1]
+        q[t] = risk[t][int(np.ceil(scenario_numbers[t] * quantile)) - 1]
     print('\tDone')
 
     return q
+
 
 ## Compute both objectives: mean risk and quantile
 def compute_objective(Instance: dict):
@@ -187,7 +200,6 @@ def compute_objective(Instance: dict):
     return mean_risk, q
 
 
-
 ##################################
 ## Constraints checkers ##########
 ##################################
@@ -204,6 +216,7 @@ def check_all_constraints(Instance: dict):
     # Exclusions constraints
     check_exclusions(Instance)
     print('Done')
+
 
 ## Schedule constraints: §4.1 in model description
 def check_schedule(Instance: dict):
@@ -225,8 +238,10 @@ def check_schedule(Instance: dict):
         start_time = intervention[START_STR]
         horizon_end = Instance[T_STR]
         if not (1 <= start_time <= horizon_end):
-            print('ERROR: Schedule constraint 4.1 time validity: Intervention ' + intervention_name + ' starting time ' + str(start_time)
-                  + ' is not a valid starting date. Expected value between 1 and ' + str(horizon_end) + '.')
+            print(
+                'ERROR: Schedule constraint 4.1 time validity: Intervention ' + intervention_name + ' starting time ' + str(
+                    start_time)
+                + ' is not a valid starting date. Expected value between 1 and ' + str(horizon_end) + '.')
             # Remove start time to avoid later access errors
             del intervention[START_STR]
             continue
@@ -234,12 +249,14 @@ def check_schedule(Instance: dict):
         #   assert intervention is not ongoing after time limit or end of horizon
         time_limit = int(intervention[TMAX_STR])
         if time_limit < start_time:
-            print('ERROR: Schedule constraint 4.1.3: Intervention ' + intervention_name + ' realization exceeds time limit.'
-                  + ' It starts at ' + str(start_time) + ' while time limit is ' + str(time_limit) + '.')
+            print(
+                'ERROR: Schedule constraint 4.1.3: Intervention ' + intervention_name + ' realization exceeds time limit.'
+                + ' It starts at ' + str(start_time) + ' while time limit is ' + str(time_limit) + '.')
             # Remove start time to avoid later access errors
             del intervention[START_STR]
             continue
     print('\tDone')
+
 
 ## Resources constraints: §4.2 in model description
 def check_resources(Instance: dict):
@@ -251,7 +268,7 @@ def check_resources(Instance: dict):
     # Bounds are checked with a tolerance value
     tolerance = 1e-5
     # Compute resource usage
-    resource_usage = compute_resources(Instance) # dict on resources and time
+    resource_usage = compute_resources(Instance)  # dict on resources and time
     # Compare bounds to usage
     for resource_name, resource in Resources.items():
         for time in range(T_max):
@@ -262,13 +279,20 @@ def check_resources(Instance: dict):
             worload = resource_usage[resource_name][time]
             # Check max
             if worload > upper_bound + tolerance:
-                print('ERROR: Resources constraint 4.2 upper bound: Worload on Resource ' + resource_name + ' at time ' + str(time+1) + ' exceeds upper bound.'
-                      + ' Value ' + str(worload) + ' is greater than bound ' + str(upper_bound) + ' plus tolerance ' + str(tolerance) + '.')
+                print(
+                    'ERROR: Resources constraint 4.2 upper bound: Worload on Resource ' + resource_name + ' at time ' + str(
+                        time + 1) + ' exceeds upper bound.'
+                    + ' Value ' + str(worload) + ' is greater than bound ' + str(
+                        upper_bound) + ' plus tolerance ' + str(tolerance) + '.')
             # Check min
             if worload < lower_bound - tolerance:
-                print('ERROR: Resources constraint 4.2 lower bound: Worload on Resource ' + resource_name + ' at time ' + str(time+1) + ' does not match lower bound.'
-                      + ' Value ' + str(worload) + ' is lower than bound ' + str(lower_bound) + ' minus tolerance ' + str(tolerance) + '.')
+                print(
+                    'ERROR: Resources constraint 4.2 lower bound: Worload on Resource ' + resource_name + ' at time ' + str(
+                        time + 1) + ' does not match lower bound.'
+                    + ' Value ' + str(worload) + ' is lower than bound ' + str(lower_bound) + ' minus tolerance ' + str(
+                        tolerance) + '.')
     print('\tDone')
+
 
 ## Exclusions constraints: §4.3 in model description
 def check_exclusions(Instance: dict):
@@ -292,14 +316,16 @@ def check_exclusions(Instance: dict):
         intervention_1_start_time = intervention_1[START_STR]
         intervention_2_start_time = intervention_2[START_STR]
         # ... and their respective deltas (duration)
-        intervention_1_delta = int(intervention_1[DELTA_STR][intervention_1_start_time - 1]) # get index in list
-        intervention_2_delta = int(intervention_2[DELTA_STR][intervention_2_start_time - 1]) # get index in list
+        intervention_1_delta = int(intervention_1[DELTA_STR][intervention_1_start_time - 1])  # get index in list
+        intervention_2_delta = int(intervention_2[DELTA_STR][intervention_2_start_time - 1])  # get index in list
         # Check overlaps for each time step of the season
         for time_str in Instance[SEASONS_STR][season]:
             time = int(time_str)
-            if (intervention_1_start_time <= time < intervention_1_start_time + intervention_1_delta) and (intervention_2_start_time <= time < intervention_2_start_time + intervention_2_delta):
-                print('ERROR: Exclusions constraint 4.3: Interventions ' + intervention_1_name + ' and ' + intervention_2_name
-                      + ' are both ongoing at time ' + str(time) + '.')
+            if (intervention_1_start_time <= time < intervention_1_start_time + intervention_1_delta) and (
+                    intervention_2_start_time <= time < intervention_2_start_time + intervention_2_delta):
+                print(
+                    'ERROR: Exclusions constraint 4.3: Interventions ' + intervention_1_name + ' and ' + intervention_2_name
+                    + ' are both ongoing at time ' + str(time) + '.')
     print('\tDone')
 
 
@@ -327,7 +353,7 @@ def display_basic(Instance: dict, mean_risk, quantile):
     tmp = np.zeros(len(quantile))
     obj_2 = np.mean(np.max(np.vstack((quantile - mean_risk, tmp)), axis=0))
     print('\tObjective 2 (expected excess  (Q' + str(q) + ')): ', obj_2)
-    obj_tot = alpha * obj_1 + (1-alpha)*obj_2
+    obj_tot = alpha * obj_1 + (1 - alpha) * obj_2
     print('\tTotal objective (alpha*mean_risk + (1-alpha)*expected_excess): ', obj_tot)
 
 

@@ -33,7 +33,7 @@ vector<Resource> Parser::parseResources() {
     for (auto &el : this->data[RESOURCES].items()) {
         auto val = el.value();
         resource_name_mapper[el.key()] = id;
-        resources.push_back({el.key(), id, parseArray(val["max"]), parseArray(val["min"])});
+        resources.push_back({el.key(), id, parseArray(val[MAX]), parseArray(val[MIN])});
         id++;
     }
     return resources;
@@ -54,8 +54,8 @@ vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
     int id = 0;
     for (auto &intervention : this->data[INTERVENTIONS].items()) {
         auto cur = intervention.value();
-        vector<int> delta = parseIntArray(cur["Delta"]);
-        int tmax = stoi(cur["tmax"].get<std::string>())-1;
+        vector<int> delta = parseIntArray(cur[DELTA]);
+        int tmax = stoi(cur[TMAX].get<std::string>())-1;
         auto workload = parseWorkload(resources, cur, tmax);
         auto risk = parseRisk(cur);
         intervention_name_mapper[intervention.key()] = id;
@@ -103,11 +103,12 @@ vector<float> Parser::parseArray(const json &j) {
     return nums;
 }
 
-vector<vector<vector<double>>> Parser::parseRisk(const json &intervention){
-    vector<vector<vector<double>>> risk_vec;
+riskVector Parser::parseRisk(const json &intervention){
+    riskVector risk_vec;
     // parse risk (iterate over el.value().items()
     for (auto &risk : intervention[RISK].items()) {
         vector<vector<double>> first;
+        int last;
         for (auto &t: risk.value().items()) {
             vector<double> second;
             for (auto &tsht: t.value().items()) {
@@ -115,9 +116,10 @@ vector<vector<vector<double>>> Parser::parseRisk(const json &intervention){
                     second.push_back((double)element.value());
                 }
             }
+            last = stoi(t.key())-1;
             first.push_back(second);
         }
-        risk_vec.push_back(first);
+        risk_vec.push_back({last, first});
     }
     return risk_vec;
 }

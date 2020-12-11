@@ -34,7 +34,7 @@ int main() {
     cout << "==== Reading Data ===" << endl;
 
     signal(SIGALRM, catchAlarm);
-    alarm(EXECUITON_TIME_SEC);
+    alarm(EXECUITON_TIME_SEC*TIMES);
 
     Parser p("../A_set/A_09.json");
     d = p.parseJsonToSchedule();

@@ -18,7 +18,7 @@ vector<int> ImprovedRandomSolver::solve() {
     int best_score = 999999999;
     Checker checker({}, data);
 
-    for (int i = 0; i < 1000000; i++) {
+    for (int i = 0; i < 100000; i++) {
         for (int j = 0; j < schedule.size(); j++) {
             int cur = rand() % data.interventions[j].tmax;
             schedule[j] = cur;

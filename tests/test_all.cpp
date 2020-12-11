@@ -92,11 +92,12 @@ TEST_CASE("Time horizon is correct") {
 
 TEST_CASE("Risk distribution is parsed correctly") {
     p.data = "{\"risk\":{ \"1\":{ \"1\":[ 1.1, 2.2, 3.3, 4.4, 5.5, 6.6 ]}, \"2\":{ \"1\":[ 1.11, 2.22, 3.33], \"2\":[ 1.2, 2.74, 3.94, 4.58, 5.62, 6.39, 7.7 ]}}}"_json;
-    vector<vector<vector<double>>> risk = p.parseRisk(p.data);
+    riskVector risk = p.parseRisk(p.data);
     REQUIRE(risk.size() == 2);
-    REQUIRE(risk[0].size() == 1);
-    REQUIRE((risk[0][0].size() == 6 && risk[1][0].size() == 3 && risk[1][1].size() == 7));
-    REQUIRE(risk[1][0] == vector<double>{1.11, 2.22, 3.33});
+    REQUIRE(risk[0].second.size() == 1);
+
+    REQUIRE((risk[0].second[0].size() == 6 && risk[1].second[0].size() == 3 && risk[1].second[1].size() == 7));
+    REQUIRE(risk[1].second[0] == vector<double>{1.11, 2.22, 3.33});
 }
 
 TEST_CASE("Resource consumption is correct") {
@@ -159,8 +160,10 @@ TEST_CASE("Exclusions are correct") {
 TEST_CASE("Objective function is computed correctly"){
     Parser parser("../A_set/A_09.json");
     auto d = parser.parseJsonToSchedule();
-    vector<int> schedule(d.interventions.size());
+    vector<int> schedule {2, 10, 4, 14, 6, 1, 1, 12, 3, 12, 13, 6, 8, 4, 9, 15, 7, 15};
+    for (auto& inter:schedule)
+        inter--;
     Checker c(schedule, d);
     double res = c.computeMetric();
-    cout << "done" << endl;
+    cout << res << endl;
 }

@@ -12,7 +12,6 @@ using namespace std;
 
 using json = nlohmann::ordered_json;
 
-
 class Parser {
 public:
     Parser() = default;
@@ -32,7 +31,7 @@ public:
 
     workloadVec parseWorkload(vector<Resource> resources, const json &intervention, int tmax);
 
-    vector<vector<vector<double>>> parseRisk(const json &intervention);
+    riskVector parseRisk(const json &intervention);
 
     vector<float> parseArray(const json &j);
 

@@ -28,6 +28,12 @@ public:
     vector<int> schedule;
     vector<vector<float>> resource_consumption;
     const DataInstance &data;
+
+    double computeObjective1(vector<double> mean_risk);
+
+    double computeObjective2(vector<double> q, vector<double> mean_risk);
+
+    tuple<vector<double>, vector<double>> getRiskDistribution();
 };
 
 
