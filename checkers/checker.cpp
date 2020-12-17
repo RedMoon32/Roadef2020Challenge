@@ -9,18 +9,19 @@
 
 using namespace std;
 
-int Checker::checkAll() {
+int Checker::checkAll(vector<int> schedule) {
+    this->schedule = schedule;
     if (data.interventions.size() != schedule.size())
         return -1;
 
     int res1 = checkHorizon();
     if (res1 != 0) {
-        return -checkHorizon();
+        return 100000*checkHorizon();
     }
 
     res1 = checkExclusions();
     if (res1 != 0) {
-        return -10000 * res1;
+        return 1000 * res1;
     }
 
     res1 = checkResourceConstraint();
@@ -28,11 +29,12 @@ int Checker::checkAll() {
         return res1;
     }
 
-    return 0;
+    return computeMetric()-500000;
 }
 
 int Checker::checkResourceConstraint() {
-
+    vector<vector<int>> all_resource(data.T);
+    wrong_resource_intervention = vector<int>();
     int wrong_res = 0;
 
     for (int inter = 0; inter < schedule.size(); inter++) {
@@ -40,17 +42,21 @@ int Checker::checkResourceConstraint() {
         auto cur_job = data.interventions[inter];
         for (auto &res: cur_job.workload) {
             for (int tsht = 0; tsht < res.second[start_time].size(); tsht++) {
-                float &target = resource_consumption[res.first.id][tsht + start_time];
+                int new_time = tsht + start_time;
+                float &target = resource_consumption[res.first.id][new_time];
                 target += res.second[start_time][tsht];
+                all_resource[new_time].push_back(inter);
             }
         }
     }
 
     for (int res = 0; res < resource_consumption.size(); res++) {
         for (int time = 0; time < data.T; time++) {
-            if (resource_consumption[res][time] < data.resources[res].min[time] |
-                resource_consumption[res][time] > data.resources[res].max[time])
+            if (resource_consumption[res][time] < data.resources[res].min[time]|
+                resource_consumption[res][time] > data.resources[res].max[time]) {
                 wrong_res += 1;
+                wrong_resource_intervention.insert(wrong_resource_intervention.end(), all_resource[time].begin(), all_resource[time].end());
+            }
             resource_consumption[res][time] = 0;
         }
     }
@@ -69,19 +75,22 @@ int Checker::checkHorizon() {
 
 int Checker::checkExclusions() {
     int excounter = 0;
+    wrong_exclusion.clear();
     for (const auto &exc: data.exclusions) {
         int time1 = schedule[exc.int1.id] + 1;
         int time2 = schedule[exc.int2.id] + 1;
         auto &v = exc.season.times;
         if (binary_search(v.begin(), v.end(), time1) && binary_search(v.begin(), v.end(), time2)) {
             excounter += 1;
+            wrong_exclusion.push_back(exc.int1.id);
+            wrong_exclusion.push_back(exc.int2.id);
         }
     }
     return excounter;
 }
 
-Checker::Checker(vector<int> schedule, const DataInstance &data) :
-        data(data), schedule(schedule) {
+Checker::Checker(const DataInstance &data) :
+        data(data) {
     resource_consumption = vector<vector<float>>(data.resources.size(), vector<float>(data.T));
 }
 
@@ -154,4 +163,87 @@ double Checker::computeMetric() {
     double obj_2 = computeObjective2(q, mean_risk);
     double obj_total = data.Alpha * obj_1 + (1 - data.Alpha) * obj_2;
     return obj_total;
+}
+
+
+// ============================== this is faster version of original checker ================================
+
+vector<int> FastChecker::computeChange(){
+    vector<int> changed;
+    for (int i = 0; i < schedule.size(); i++){
+        if (prevSchedule[i] != schedule[i])
+            changed.push_back(i);
+    }
+    return changed;
+}
+
+void FastChecker::setConsumption(int resource_id, int time, double value) {
+    auto consumption = wrongResource[resource_id][time];
+
+    //check for max
+    if (!consumption.first && value > data.resources[resource_id].max[time]) {
+        consumption.first = true;
+        prevWrong++;
+    }
+    else if (consumption.first && value <= data.resources[resource_id].max[time]) {
+        consumption.first = false;
+        prevWrong--;
+    }
+    // ===== check for min
+    if (!consumption.second && value < data.resources[resource_id].min[time]) {
+        consumption.second = true;
+        prevWrong++;
+    }
+    else if (consumption.second && value >= data.resources[resource_id].min[time]) {
+        consumption.second = false;
+        prevWrong--;
+    }
+}
+
+
+int FastChecker::checkResourceConstraint() {
+
+    if (prevSchedule.empty())
+    {
+        wrongResource = vector<vector<pair<bool, bool>>>(data.resources.size(), vector<pair<bool, bool>>(data.T));
+        prevWrong = Checker::checkResourceConstraint();
+        prevSchedule = schedule;
+        for (int res = 0; res < resource_consumption.size(); res++) {
+            for (int time = 0; time < data.T; time++) {
+                if (resource_consumption[res][time] > data.resources[res].max[time])
+                    wrongResource[res][time].first = true;
+                if (resource_consumption[res][time] < data.resources[res].min[time])
+                    wrongResource[res][time].second = true;
+            }
+        }
+        return prevWrong;
+    }
+    auto changed = computeChange();
+
+    for (int inter: changed) {
+        int start_time = schedule[inter];
+        int prev_start = prevSchedule[inter];
+        auto cur_job = data.interventions[inter];
+
+        // increment for new timeslot
+        for (auto &res: cur_job.workload) {
+            for (int tsht = 0; tsht < res.second[start_time].size(); tsht++) {
+                int new_time = tsht + start_time;
+                auto resource = res.first.id;
+                float &target = resource_consumption[resource][new_time];
+                target += res.second[start_time][tsht];
+                setConsumption(resource, new_time, target);
+            }
+            for (int tsht = 0; tsht < res.second[prev_start].size(); tsht++) {
+                int new_time = tsht + prev_start;
+                auto resource = res.first.id;
+                float &target = resource_consumption[resource][new_time];
+                target -= res.second[prev_start][tsht];
+                setConsumption(resource, new_time, target);
+            }
+        }
+    }
+    cout << prevWrong;
+    prevSchedule = schedule;
+    return prevWrong;
 }

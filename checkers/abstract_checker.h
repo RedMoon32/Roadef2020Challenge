@@ -8,7 +8,7 @@
 class AbstractChecker {
 public:
 
-    virtual int checkAll() = 0;
+    virtual int checkAll(vector<int>) = 0;
 
     virtual int checkResourceConstraint() = 0;
 

@@ -6,6 +6,11 @@
 #define ROADEF2020CHALLENGE_ABSTRACT_SOLVER_H
 
 #include "parser.h"
+#include "checker.h"
+
+extern vector<int> best_solution;
+
+void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);
 
 class AbstractSolver {
 public:

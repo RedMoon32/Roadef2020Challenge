@@ -9,15 +9,11 @@
 #include "abstract_solver.h"
 
 
-void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);
-
 class RandomSolver : public AbstractSolver {
 public:
-    RandomSolver(const DataInstance &data, int computationTime);
+    RandomSolver(const DataInstance &data);
     vector<int> solve() override;
     const DataInstance &data;
-private:
-    int computationTime = 0;
 };
 
 

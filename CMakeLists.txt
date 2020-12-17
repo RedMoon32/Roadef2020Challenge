@@ -11,12 +11,14 @@ set(SOURCE_FILES
         structs/parser.cpp
         checkers/checker.cpp
         checkers/checker.h
-        checkers/partial_checker.cpp
-        checkers/partial_checker.h
         solvers/random_solver.cpp
         solvers/random_solver.h
         solvers/improved_random_solver.cpp
-        solvers/improved_random_solver.h solvers/abstract_solver.h
+        solvers/improved_random_solver.h
+        solvers/abstract_solver.h
+        solvers/abstract_solver.cpp
+        solvers/smart_solver.h
+        solvers/smart_solver.cpp
         structs/structs.h checkers/abstract_checker.h)
 
 add_executable(Roadef2020Challenge
@@ -34,8 +36,8 @@ add_executable(Tests
         ${SOURCE_FILES}
         )
 
-SET(CMAKE_CXX_FLAGS "-O0")
-SET(CMAKE_C_FLAGS "-O0")
+SET(CMAKE_CXX_FLAGS "-O3")
+SET(CMAKE_C_FLAGS "-O3")
 
 #-Wa,-mbig-obj
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -std=gnu++14")

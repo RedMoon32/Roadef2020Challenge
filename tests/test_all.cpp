@@ -165,5 +165,5 @@ TEST_CASE("Objective function is computed correctly"){
         inter--;
     Checker c(schedule, d);
     double res = c.computeMetric();
-    cout << res << endl;
+    REQUIRE(abs(res - 1772.57) < 0.01);
 }

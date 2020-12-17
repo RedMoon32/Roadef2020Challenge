@@ -10,9 +10,9 @@
 
 class Checker : public AbstractChecker {
 public:
-    Checker(vector<int> schedule, const DataInstance &data);
+    Checker(const DataInstance &data);
 
-    int checkAll() override;
+    int checkAll(vector<int> schedule) override;
 
     int checkResourceConstraint() override;
 
@@ -25,9 +25,12 @@ public:
     vector<double> computeQuantile(vector<vector<double>> &risk);
     double computeMetric();
 
+    vector<int> wrong_exclusion;
+    vector<int> wrong_resource_intervention;
+
     vector<int> schedule;
     vector<vector<float>> resource_consumption;
-    const DataInstance &data;
+    DataInstance data;
 
     double computeObjective1(vector<double> mean_risk);
 
@@ -36,5 +39,14 @@ public:
     tuple<vector<double>, vector<double>> getRiskDistribution();
 };
 
-
+class FastChecker: public Checker {
+public:
+    using Checker::Checker;
+    int checkResourceConstraint() override;
+    vector<int> computeChange();
+    void setConsumption(int resource_id, int time, double value);
+    vector<int> prevSchedule;
+    vector<vector<pair<bool, bool>>> wrongResource;
+    int prevWrong;
+};
 #endif //ROADEF2020CHALLENGE_CHECKER_H

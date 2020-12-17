@@ -11,6 +11,7 @@
 #include "json.hpp"
 #include "random_solver.h"
 #include "improved_random_solver.h"
+#include "smart_solver.h"
 #include "checker.h"
 #include "parser.h"
 
@@ -18,8 +19,8 @@ using namespace std;
 using namespace nlohmann;
 using namespace std::chrono;
 
-#define TIMES 1000
-#define EXECUITON_TIME_SEC 30
+#define TIMES 100
+#define EXECUITON_TIME_MIN 15
 
 DataInstance d;
 
@@ -30,27 +31,30 @@ void catchAlarm(int) {
 }
 
 int main() {
-    srand(time(nullptr));
+    srand(0);
     cout << "==== Reading Data ===" << endl;
 
     signal(SIGALRM, catchAlarm);
-    alarm(EXECUITON_TIME_SEC*TIMES);
+    signal(SIGTERM, catchAlarm);
 
-    Parser p("../A_set/A_09.json");
+    alarm(EXECUITON_TIME_MIN*60);
+
+    Parser p("../A_set/A_06.json");
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
-    ImprovedRandomSolver solver(d, -1);
+    ImprovedRandomSolver solver(d);
     vector<int> result;
     float duration;
 
     clock_t tStart = clock();
     result = solver.solve();
-    unique_ptr<AbstractChecker> checker(new Checker(result, d));
-    float res = checker->checkAll();
+    unique_ptr<AbstractChecker> checker(new Checker(d));
+    float res = checker->checkAll(result);
     clock_t tStop = clock();
     duration = (double)(tStop - tStart) / CLOCKS_PER_SEC ;
 
     write_result("../out.txt", result, d.interventions);
-    cout << "\n Resultant score: " << res << "\nExecution time " << duration << ", average per check time " << (float) duration / (float) TIMES << endl;
+    cout << "\n Resultant score: " << res << "\nExecution time " << duration <<
+    ", average per check time " << (float) duration / (float) TIMES << endl;
     return 0;
 }

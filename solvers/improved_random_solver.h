@@ -5,18 +5,14 @@
 #ifndef ROADEF2020CHALLENGE_IMPROVED_RANDOM_SOLVER_H
 #define ROADEF2020CHALLENGE_IMPROVED_RANDOM_SOLVER_H
 
-#include "abstract_solver.h"
+#include "random_solver.h"
 #include "parser.h"
 
-extern vector<int> best_solution;
 
-class ImprovedRandomSolver: public AbstractSolver{
+class ImprovedRandomSolver: public RandomSolver{
 public:
-    ImprovedRandomSolver(const DataInstance &data, int computationTime);
+    using RandomSolver::RandomSolver;
     vector<int> solve() override;
-    const DataInstance &data;
-private:
-    int computationTime = 0;
 };
 
 
