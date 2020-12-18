@@ -31,16 +31,16 @@ vector<int> ImprovedRandomSolver::solve() {
             }
         }
         cout << "Pre iterations done, starting to improve best solution" << endl;
-        for (int i = 0; i < 40000; i++) {
+        for (int i = 0; i < 100000; i++) {
             if (best_score == 0)
                 break;
 
             vector<int> schedule = best;
-            int rand_count = rand() % 2 + 1;
-            auto swap_ids = checker.wrong_resource_intervention;
+            int rand_count = rand() % 3 + 1;
+            auto swap_ids = !checker.wrong_exclusion.empty()? checker.wrong_exclusion : checker.wrong_resource_intervention;
             for (int j = 0; j < rand_count; j++) {
                 int randindex;
-                if (rand() % 3 == 0 && !swap_ids.empty())
+                if (rand() % 4 > 0 && !swap_ids.empty())
                     randindex = swap_ids[rand() % swap_ids.size()]; //schedule.size();
                 else
                     randindex = rand() % schedule.size();
@@ -48,7 +48,7 @@ vector<int> ImprovedRandomSolver::solve() {
                 schedule[randindex] = cur;
             }
             int score = checker.checkAll(schedule);
-            if (score <= best_score || (rand() % 100 < 3 && score - best_score <= 1)) {
+            if (score <= best_score || (rand() % 100 <= (best_score <= 5 ? 0: 1) && score - best_score <= 1)) {
                 best = schedule;
                 best_score = score;
                 cout << "iteration " << i << " new best found " << best_score << endl;
@@ -57,6 +57,8 @@ vector<int> ImprovedRandomSolver::solve() {
                 cout << "iteration " << i << ", result " << best_score << endl;
         }
         break;
+        if (best_score < 0)
+            break;
     }
     cout << "Iterations done " << endl;
     return best;

@@ -41,10 +41,10 @@ int Checker::checkResourceConstraint() {
         int start_time = schedule[inter];
         auto cur_job = data.interventions[inter];
         for (auto &res: cur_job.workload) {
-            for (int tsht = 0; tsht < res.second[start_time].size(); tsht++) {
-                int new_time = tsht + start_time;
+            for (auto &req: res.second[start_time]) {
+                int new_time = req.first;
                 float &target = resource_consumption[res.first.id][new_time];
-                target += res.second[start_time][tsht];
+                target += req.second;
                 all_resource[new_time].push_back(inter);
             }
         }
@@ -93,6 +93,12 @@ Checker::Checker(const DataInstance &data) :
         data(data) {
     resource_consumption = vector<vector<float>>(data.resources.size(), vector<float>(data.T));
 }
+
+Checker::Checker(const vector<int> &temp_schedule, const DataInstance & data) {
+    resource_consumption = vector<vector<float>>(data.resources.size(), vector<float>(data.T));
+    schedule = temp_schedule;
+}
+
 
 vector<vector<double>> Checker::computeRiskDistribution() {
     vector<vector<double>> risk;
@@ -231,14 +237,14 @@ int FastChecker::checkResourceConstraint() {
                 int new_time = tsht + start_time;
                 auto resource = res.first.id;
                 float &target = resource_consumption[resource][new_time];
-                target += res.second[start_time][tsht];
+                //target += res.second[start_time][tsht];
                 setConsumption(resource, new_time, target);
             }
             for (int tsht = 0; tsht < res.second[prev_start].size(); tsht++) {
                 int new_time = tsht + prev_start;
                 auto resource = res.first.id;
                 float &target = resource_consumption[resource][new_time];
-                target -= res.second[prev_start][tsht];
+                //target -= res.second[prev_start][tsht];
                 setConsumption(resource, new_time, target);
             }
         }

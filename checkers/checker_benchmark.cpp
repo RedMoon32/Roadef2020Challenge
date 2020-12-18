@@ -20,7 +20,7 @@ using namespace nlohmann;
 using namespace std::chrono;
 
 #define TIMES 100
-#define EXECUITON_TIME_MIN 15
+#define EXECUITON_TIME_MIN 30
 
 DataInstance d;
 
@@ -39,7 +39,7 @@ int main() {
 
     alarm(EXECUITON_TIME_MIN*60);
 
-    Parser p("../A_set/A_06.json");
+    Parser p("../A_set/A_03.json");
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
     ImprovedRandomSolver solver(d);

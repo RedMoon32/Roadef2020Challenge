@@ -2,5 +2,5 @@
 .idea
 venv
 cmake-build-debug
-
+out.txt
 A_set/

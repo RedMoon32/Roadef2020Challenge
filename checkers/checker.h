@@ -11,6 +11,7 @@
 class Checker : public AbstractChecker {
 public:
     Checker(const DataInstance &data);
+    Checker(const vector<int>& schedule, const DataInstance & data);
 
     int checkAll(vector<int> schedule) override;
 

@@ -128,11 +128,12 @@ workloadVec Parser::parseWorkload(vector<Resource> resources, const json &interv
     workloadVec workloads;
     // parse workload (iterate over el.value().items()
     for (auto &workload : intervention[RESOURCE_CHARGE].items()) {
-        vector<vector<double>> workload_by_start_time(tmax+1);
+        resourceWorkload workload_by_start_time(tmax+1);
         for (auto &t: workload.value().items()) {
-            vector<double> second;
             for (auto &tsht: t.value().items()) {
-                workload_by_start_time[stoi(tsht.key())-1].push_back(tsht.value());
+                int time_when_required = stoi(t.key())-1;
+                int time_start = stoi(tsht.key()) - 1;
+                workload_by_start_time[time_start].push_back({time_when_required, tsht.value()});
             }
         }
         string name = workload.key();

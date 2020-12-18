@@ -27,7 +27,8 @@ struct Season {
     vector<int> times;
 };
 
-typedef vector<pair<Resource, vector<vector<double>>>> workloadVec;
+typedef vector<vector<pair<int, double>>> resourceWorkload;
+typedef vector<pair<Resource, resourceWorkload>> workloadVec;
 
 struct Intervention {
     string name;
