@@ -39,7 +39,7 @@ int main() {
 
     alarm(EXECUITON_TIME_MIN*60);
 
-    Parser p("../A_set/A_03.json");
+    Parser p("../A_set/A_02.json");
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
     ImprovedRandomSolver solver(d);

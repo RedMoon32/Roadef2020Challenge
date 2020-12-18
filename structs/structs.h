@@ -55,6 +55,7 @@ struct DataInstance {
     vector<Intervention> interventions;
     vector<Resource> resources;
     vector<Exclusion> exclusions;
+    vector<Season> seasons;
     vector<int> scenarious_number;
 
 };

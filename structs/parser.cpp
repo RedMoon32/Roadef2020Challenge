@@ -41,10 +41,11 @@ vector<Resource> Parser::parseResources() {
 
 vector<Season> Parser::parseSeasons() {
     vector<Season> seasons;
+    int id = 0;
     for (auto &el : this->data[SEASONS].items()) {
         auto first = el.key();
         auto second = el.value();
-        seasons.push_back({first, 0, parseIntArray(second)});
+        seasons.push_back({first, id++, parseIntArray(second)});
     }
     return seasons;
 }
@@ -152,7 +153,7 @@ DataInstance Parser::parseJsonToSchedule() {
     int T = data[T_STR].get<int>();
     double Quantile = data[QUANTILE];
     double Alpha = data[ALPHA];
-    return DataInstance{T, Quantile, Alpha, interventions, resources, exclusions, scenarious_number};
+    return DataInstance{T, Quantile, Alpha, interventions, resources, exclusions, seasons,  scenarious_number};
 }
 
 Parser::Parser(const string &path) {

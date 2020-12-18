@@ -16,7 +16,7 @@ int Checker::checkAll(vector<int> schedule) {
 
     int res1 = checkHorizon();
     if (res1 != 0) {
-        return 100000*checkHorizon();
+        return 100000 * checkHorizon();
     }
 
     res1 = checkExclusions();
@@ -29,7 +29,7 @@ int Checker::checkAll(vector<int> schedule) {
         return res1;
     }
 
-    return computeMetric()-500000;
+    return computeMetric() - 500000;
 }
 
 int Checker::checkResourceConstraint() {
@@ -52,10 +52,11 @@ int Checker::checkResourceConstraint() {
 
     for (int res = 0; res < resource_consumption.size(); res++) {
         for (int time = 0; time < data.T; time++) {
-            if (resource_consumption[res][time] < data.resources[res].min[time]|
+            if (resource_consumption[res][time] < data.resources[res].min[time] |
                 resource_consumption[res][time] > data.resources[res].max[time]) {
                 wrong_res += 1;
-                wrong_resource_intervention.insert(wrong_resource_intervention.end(), all_resource[time].begin(), all_resource[time].end());
+                wrong_resource_intervention.insert(wrong_resource_intervention.end(), all_resource[time].begin(),
+                                                   all_resource[time].end());
             }
             resource_consumption[res][time] = 0;
         }
@@ -77,13 +78,18 @@ int Checker::checkExclusions() {
     int excounter = 0;
     wrong_exclusion.clear();
     for (const auto &exc: data.exclusions) {
-        int time1 = schedule[exc.int1.id] + 1;
-        int time2 = schedule[exc.int2.id] + 1;
+        auto &job1 = exc.int1;
+        auto &job2 = exc.int2;
+        int time1 = schedule[job1.id] + 1;
+        int time2 = schedule[job2.id] + 1;
         auto &v = exc.season.times;
-        if (binary_search(v.begin(), v.end(), time1) && binary_search(v.begin(), v.end(), time2)) {
-            excounter += 1;
-            wrong_exclusion.push_back(exc.int1.id);
-            wrong_exclusion.push_back(exc.int2.id);
+        for (auto time: v) {
+            if (time1 <= time && time <= time1 + job1.delta[time1 - 1] &&
+                time2 <= time && time <= time2 + job2.delta[time2 - 1]) {
+                excounter += 1;
+                wrong_exclusion.push_back(job1.id);
+                wrong_exclusion.push_back(job2.id);
+            }
         }
     }
     return excounter;
@@ -94,7 +100,7 @@ Checker::Checker(const DataInstance &data) :
     resource_consumption = vector<vector<float>>(data.resources.size(), vector<float>(data.T));
 }
 
-Checker::Checker(const vector<int> &temp_schedule, const DataInstance & data) {
+Checker::Checker(const vector<int> &temp_schedule, const DataInstance &data) {
     resource_consumption = vector<vector<float>>(data.resources.size(), vector<float>(data.T));
     schedule = temp_schedule;
 }
@@ -174,9 +180,9 @@ double Checker::computeMetric() {
 
 // ============================== this is faster version of original checker ================================
 
-vector<int> FastChecker::computeChange(){
+vector<int> FastChecker::computeChange() {
     vector<int> changed;
-    for (int i = 0; i < schedule.size(); i++){
+    for (int i = 0; i < schedule.size(); i++) {
         if (prevSchedule[i] != schedule[i])
             changed.push_back(i);
     }
@@ -190,8 +196,7 @@ void FastChecker::setConsumption(int resource_id, int time, double value) {
     if (!consumption.first && value > data.resources[resource_id].max[time]) {
         consumption.first = true;
         prevWrong++;
-    }
-    else if (consumption.first && value <= data.resources[resource_id].max[time]) {
+    } else if (consumption.first && value <= data.resources[resource_id].max[time]) {
         consumption.first = false;
         prevWrong--;
     }
@@ -199,8 +204,7 @@ void FastChecker::setConsumption(int resource_id, int time, double value) {
     if (!consumption.second && value < data.resources[resource_id].min[time]) {
         consumption.second = true;
         prevWrong++;
-    }
-    else if (consumption.second && value >= data.resources[resource_id].min[time]) {
+    } else if (consumption.second && value >= data.resources[resource_id].min[time]) {
         consumption.second = false;
         prevWrong--;
     }
@@ -209,8 +213,7 @@ void FastChecker::setConsumption(int resource_id, int time, double value) {
 
 int FastChecker::checkResourceConstraint() {
 
-    if (prevSchedule.empty())
-    {
+    if (prevSchedule.empty()) {
         wrongResource = vector<vector<pair<bool, bool>>>(data.resources.size(), vector<pair<bool, bool>>(data.T));
         prevWrong = Checker::checkResourceConstraint();
         prevSchedule = schedule;

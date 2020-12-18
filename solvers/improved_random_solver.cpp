@@ -18,7 +18,7 @@ vector<int> ImprovedRandomSolver::solve() {
         long long best_score = 999999999;
         counter ++;
         cout << counter << endl;
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 1000; i++) {
             for (int j = 0; j < schedule.size(); j++) {
                 int cur = rand() % data.interventions[j].tmax;
                 schedule[j] = cur;
@@ -31,8 +31,8 @@ vector<int> ImprovedRandomSolver::solve() {
             }
         }
         cout << "Pre iterations done, starting to improve best solution" << endl;
-        for (int i = 0; i < 100000; i++) {
-            if (best_score == 0)
+        for (int i = 0; i < 30000; i++) {
+            if (best_score <= 0)
                 break;
 
             vector<int> schedule = best;

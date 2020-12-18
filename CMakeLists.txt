@@ -36,8 +36,8 @@ add_executable(Tests
         ${SOURCE_FILES}
         )
 
-SET(CMAKE_CXX_FLAGS "-O3")
-SET(CMAKE_C_FLAGS "-O3")
+SET(CMAKE_CXX_FLAGS "-O0")
+SET(CMAKE_C_FLAGS "-O0")
 
 #-Wa,-mbig-obj
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -std=gnu++14")
