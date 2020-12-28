@@ -1,60 +1,77 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <algorithm>
 #include <cstdlib>
 #include <time.h>
 #include <unistd.h>
 #include <csignal>
-#include <sys/types.h>
-
-#include "json.hpp"
 #include "random_solver.h"
 #include "improved_random_solver.h"
-#include "smart_solver.h"
-#include "checker.h"
 #include "parser.h"
 
 using namespace std;
 using namespace nlohmann;
 using namespace std::chrono;
 
-#define TIMES 100
-#define EXECUITON_TIME_MIN 30
-
 DataInstance d;
+int time_limit = 15;
+string instance_path;
+string solution_path;
+bool name;
+int seed;
+int timeid = 228;
+clock_t c_start;
 
 void catchAlarm(int) {
     cout << "Stop Signal Arrised, writing best found solution" << endl;
-    write_result("../out.txt", best_solution, d.interventions);
-    exit(0);
+    write_result(solution_path, best_solution, d.interventions);
+    auto c_end = std::clock();
+
+    auto time_elapsed_ms = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
+    ofstream cpu_time_file;
+    cpu_time_file.open("../times.txt", ios_base::app); // append instead of overwrite
+    cpu_time_file << time_elapsed_ms << endl;
+    cout << instance_path << " " << time_elapsed_ms << endl;
+    return exit(timeid);
 }
 
-int main() {
+//  executable -t time_limit -p instance_name -o new_solution_filename -name -s seed
+void parse_args(int argc, char *argv[]) {
+    for (int i = 0; i < argc; i++) {
+        auto arg = string(argv[i]);
+        if (arg == "-t")
+            time_limit = stoi(argv[i + 1]);
+        if (arg == "-p")
+            instance_path = argv[i + 1];
+        if (arg == "-o")
+            solution_path = argv[i + 1];
+        if (arg == "-name")
+            name = true;
+        if (arg == "-s")
+            seed = stoi(argv[i + 1]);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    c_start = clock();
     srand(0);
     cout << "==== Reading Data ===" << endl;
+    parse_args(argc, argv);
 
     signal(SIGALRM, catchAlarm);
-    signal(SIGTERM, catchAlarm);
+    signal(SIGKILL, catchAlarm);
 
-    alarm(EXECUITON_TIME_MIN*60);
+    alarm((time_limit - 1) * 60);
 
-    Parser p("../A_set/A_02.json");
+    Parser p(instance_path);
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
-    ImprovedRandomSolver solver(d);
-    vector<int> result;
-    float duration;
+    StochasticWalkSolver solver1(d);
+    StochasticWalkSolver solver2(d);
 
-    clock_t tStart = clock();
-    result = solver.solve();
-    unique_ptr<AbstractChecker> checker(new Checker(d));
-    float res = checker->checkAll(result);
-    clock_t tStop = clock();
-    duration = (double)(tStop - tStart) / CLOCKS_PER_SEC ;
+    thread thread1([&] (AbstractSolver * solver) { solver->solve(); }, &solver1);
+    thread thread2([&] (AbstractSolver * solver) { solver->solve(); }, &solver2);
 
-    write_result("../out.txt", result, d.interventions);
-    cout << "\n Resultant score: " << res << "\nExecution time " << duration <<
-    ", average per check time " << (float) duration / (float) TIMES << endl;
-    return 0;
+    thread1.join();
+    thread2.join();
+
+    catchAlarm(0);
 }

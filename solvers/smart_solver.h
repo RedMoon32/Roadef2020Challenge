@@ -10,9 +10,9 @@
 
 typedef vector<vector<int>> populationVec;
 
-class GeneticSolver: public ImprovedRandomSolver{
+class GeneticSolver: public StochasticWalkSolver{
 public:
-    using ImprovedRandomSolver::ImprovedRandomSolver;
+    using StochasticWalkSolver::StochasticWalkSolver;
     populationVec getInitialPopulation();
     populationVec getNBest(populationVec&);
     void crossover(populationVec&);

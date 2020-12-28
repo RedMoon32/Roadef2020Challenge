@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "checker.h"
 
+extern mutex solution_lock;
 extern vector<int> best_solution;
 
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);

@@ -7,7 +7,7 @@
 
 #include "parser.h"
 #include "abstract_solver.h"
-
+#include <pthread.h>
 
 class RandomSolver : public AbstractSolver {
 public:

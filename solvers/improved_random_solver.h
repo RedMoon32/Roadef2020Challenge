@@ -9,7 +9,7 @@
 #include "parser.h"
 
 
-class ImprovedRandomSolver: public RandomSolver{
+class StochasticWalkSolver: public RandomSolver{
 public:
     using RandomSolver::RandomSolver;
     vector<int> solve() override;

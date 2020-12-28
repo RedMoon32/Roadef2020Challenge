@@ -7,16 +7,16 @@
 
 vector<int> best_solution;
 
-vector<int> ImprovedRandomSolver::solve() {
+
+vector<int> StochasticWalkSolver::solve() {
     vector<int> schedule(data.interventions.size());
     vector<int> &best = best_solution;
     Checker checker(data);
     int counter = 0;
     long long best_score = 999999999;
-    while (best_score > 0 && counter < 5)
-    {
+    while (true) {
         long long best_score = 999999999;
-        counter ++;
+        counter++;
         cout << counter << endl;
         for (int i = 0; i < 1000; i++) {
             for (int j = 0; j < schedule.size(); j++) {
@@ -25,40 +25,48 @@ vector<int> ImprovedRandomSolver::solve() {
             }
             int score = checker.checkAll(schedule);
             if (score < best_score) {
+
+                solution_lock.lock();
                 best = schedule;
+                solution_lock.unlock();
+
                 best_score = score;
-                cout << "pre iteration " << i << " new best found " << best_score << endl;
+                //cout << "pre iteration " << i << " new best found " << best_score << endl;
             }
         }
-        cout << "Pre iterations done, starting to improve best solution" << endl;
-        for (int i = 0; i < 30000; i++) {
-            if (best_score <= 0)
-                break;
+        //cout << "Pre iterations done, starting to improve best solution" << endl;
+        int i = 0;
 
+        vector<int> bad_res;
+        while (true) {
             vector<int> schedule = best;
-            int rand_count = rand() % 3 + 1;
-            auto swap_ids = !checker.wrong_exclusion.empty()? checker.wrong_exclusion : checker.wrong_resource_intervention;
+            int rand_count = rand() % 4 == 0 ? 2 : 1;
+
             for (int j = 0; j < rand_count; j++) {
                 int randindex;
-                if (rand() % 4 > 0 && !swap_ids.empty())
-                    randindex = swap_ids[rand() % swap_ids.size()]; //schedule.size();
+                if (rand() % 4 > 0 && !bad_res.empty())
+                    randindex = bad_res[rand() % bad_res.size()];
                 else
                     randindex = rand() % schedule.size();
                 int cur = rand() % data.interventions[randindex].tmax;
                 schedule[randindex] = cur;
             }
             int score = checker.checkAll(schedule);
-            if (score <= best_score || (rand() % 100 <= (best_score <= 5 ? 0: 1) && score - best_score <= 1)) {
+            if (score < best_score | (score == best_score && rand() % 2 == 0)) {
+                if (!checker.wrong_resource_intervention.empty())
+                    bad_res = checker.wrong_resource_intervention;
+
+                solution_lock.lock();
                 best = schedule;
+                solution_lock.unlock();
+
                 best_score = score;
-                cout << "iteration " << i << " new best found " << best_score << endl;
             }
-            if (i % 100000 == 0)
-                cout << "iteration " << i << ", result " << best_score << endl;
+            if (i % 10000 == 0)
+                cout << "iteration " << i << " best found " << best_score << endl;
+            i ++ ;
         }
-        break;
-        if (best_score < 0)
-            break;
+
     }
     cout << "Iterations done " << endl;
     return best;
