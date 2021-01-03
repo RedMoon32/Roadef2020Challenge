@@ -170,9 +170,9 @@ TEST_CASE("Objective function is computed correctly"){
 }
 
 TEST_CASE("cc"){
-    Parser parser("../A_set/A_06.json");
+    Parser parser("../A_set/A_04.json");
     auto data = parser.parseJsonToSchedule();
-    ifstream schedule_06_wrong("../out_6_nums.txt");
+    ifstream schedule_06_wrong("../outputs/output_04.txt");
     vector<int> schedule;
     for (int i = 0; i < data.interventions.size(); i++)
     {

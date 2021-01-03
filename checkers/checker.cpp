@@ -9,12 +9,12 @@
 
 using namespace std;
 
-int Checker::checkAll(vector<int> schedule) {
+double Checker::checkAll(vector<int> schedule) {
     this->schedule = schedule;
     if (data.interventions.size() != schedule.size())
         return -1;
 
-    int res1 = checkHorizon();
+    double res1 = checkHorizon();
     if (res1 != 0) {
         return 100000 * checkHorizon();
     }
@@ -28,8 +28,8 @@ int Checker::checkAll(vector<int> schedule) {
     if (res1 != 0) {
         return res1;
     }
-
-    return computeMetric() - 500000;
+    double res = computeMetric();
+    return res - 500000.0;
 }
 
 int Checker::checkResourceConstraint() {
@@ -94,6 +94,48 @@ int Checker::checkExclusions() {
     }
     return excounter;
 }
+
+//
+//int Checker::checkExclusions() {
+//    int excounter = 0;
+//    wrong_exclusion.clear();
+//    for (const auto &exc: data.exclusions) {
+//        auto &job1 = exc.int1;
+//        auto &job2 = exc.int2;
+//
+//        int start_time1 = schedule[job1.id] + 1;
+//        int start_time2 = schedule[job2.id] + 1;
+//        auto &v = exc.season.times;
+//
+//        int end_time1 = start_time1 + job1.delta[start_time1 - 1];
+//        int end_time2 = start_time2 + job2.delta[start_time2 - 1];
+//
+//        pair<int, int> first_cord{-1, -1};
+//        pair<int, int> second_cord{-1, -1};
+//
+//        if (v.empty())
+//            continue;
+//
+//        if (start_time1 <= v.back() && end_time1 >= v[0])
+//            first_cord = {max(v[0], start_time1), min(end_time1, v.back())};
+//
+//        if (start_time2 <= v.back() && end_time2 >= v[0])
+//            second_cord = {max(v[0], start_time2), min(end_time2, v.back())};
+//
+//        if (first_cord.first == -1 || second_cord.first == -1)
+//            continue;
+//
+//        if (first_cord.first > second_cord.first)
+//            swap(first_cord, second_cord);
+//
+//        if (first_cord.second < second_cord.first)
+//            continue;
+//
+//        excounter += min(first_cord.second, second_cord.second) - second_cord.first + 1;
+//
+//    }
+//    return excounter;
+//}
 
 Checker::Checker(const DataInstance &data) :
         data(data) {

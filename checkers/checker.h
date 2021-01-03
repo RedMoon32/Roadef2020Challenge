@@ -13,7 +13,7 @@ public:
     Checker(const DataInstance &data);
     Checker(const vector<int>& schedule, const DataInstance & data);
 
-    int checkAll(vector<int> schedule) override;
+    double checkAll(vector<int> schedule) override;
 
     int checkResourceConstraint() override;
 

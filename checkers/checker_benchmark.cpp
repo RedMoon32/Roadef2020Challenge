@@ -17,19 +17,12 @@ string instance_path;
 string solution_path;
 bool name;
 int seed;
-int timeid = 228;
+int timeid = 70;
 clock_t c_start;
 
 void catchAlarm(int) {
     cout << "Stop Signal Arrised, writing best found solution" << endl;
     write_result(solution_path, best_solution, d.interventions);
-    auto c_end = std::clock();
-
-    auto time_elapsed_ms = 1000.0 * (c_end-c_start) / CLOCKS_PER_SEC;
-    ofstream cpu_time_file;
-    cpu_time_file.open("../times.txt", ios_base::app); // append instead of overwrite
-    cpu_time_file << time_elapsed_ms << endl;
-    cout << instance_path << " " << time_elapsed_ms << endl;
     return exit(timeid);
 }
 
@@ -67,8 +60,8 @@ int main(int argc, char *argv[]) {
     StochasticWalkSolver solver1(d);
     StochasticWalkSolver solver2(d);
 
-    thread thread1([&] (AbstractSolver * solver) { solver->solve(); }, &solver1);
-    thread thread2([&] (AbstractSolver * solver) { solver->solve(); }, &solver2);
+    thread thread1([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
+    thread thread2([&](AbstractSolver *solver) { solver->solve(); }, &solver2);
 
     thread1.join();
     thread2.join();
