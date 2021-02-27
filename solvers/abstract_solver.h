@@ -10,6 +10,7 @@
 
 extern mutex solution_lock;
 extern vector<int> best_solution;
+extern bool exit_;
 
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);
 

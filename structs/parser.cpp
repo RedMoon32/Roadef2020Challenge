@@ -159,6 +159,7 @@ DataInstance Parser::parseJsonToSchedule() {
 Parser::Parser(const string &path) {
     std::ifstream file(path);
     file >> data;
+
 }
 
 vector<int> Parser::parseIntArray(const json &j) {

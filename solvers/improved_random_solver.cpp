@@ -7,6 +7,7 @@
 
 vector<int> best_solution;
 double best_score = 999999999;
+bool exit_ = false;
 
 vector<int> StochasticWalkSolver::solve() {
     vector<int> schedule(data.interventions.size());
@@ -37,11 +38,9 @@ vector<int> StochasticWalkSolver::solve() {
         int i = 0;
 
         vector<int> bad_res;
-        while (true) {
+        while (not exit_) {
             vector<int> schedule = best;
             i ++ ;
-            if (best_score > -496000 && best_score < 0 && i % 10000 == 0)
-                break;
             int rand_count = rand() % 4 == 0 ? 2 : 1;
 
             for (int j = 0; j < rand_count; j++) {
@@ -73,7 +72,8 @@ vector<int> StochasticWalkSolver::solve() {
             }
             i ++ ;
         }
-
+        if (exit_)
+            break;
     }
     cout << "Iterations done " << endl;
     return best;

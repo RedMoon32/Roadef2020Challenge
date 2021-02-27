@@ -26,10 +26,9 @@ add_executable(Roadef2020Challenge
         ${SOURCE_FILES}
         )
 
-add_executable(CheckerBenchmark
+add_executable(challengeRTE
         checkers/checker_benchmark.cpp
         ${SOURCE_FILES})
-
 
 add_executable(Tests
         tests/test_all.cpp
@@ -37,7 +36,7 @@ add_executable(Tests
         )
 
 find_package(Threads)
-target_link_libraries(CheckerBenchmark ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(challengeRTE ${CMAKE_THREAD_LIBS_INIT})
 
 SET(CMAKE_CXX_FLAGS "-O3")
 SET(CMAKE_C_FLAGS "-O3")

@@ -384,3 +384,12 @@ if __name__ == '__main__':
         instance_file = sys.argv[1]
         solution_file = sys.argv[2]
         check_and_display(instance_file, solution_file)
+
+    # for num in range(1, 16):
+    #     try:
+    #         print(f"================================= {num} ==============================")
+    #         instance_file = f"./A_set/A_{str(num).zfill(2)}.json"
+    #         solution_file = f"./outputs/output_{str(num).zfill(2)}.txt" #sys.argv[2]
+    #         check_and_display(instance_file, solution_file)
+    #     except:
+    #         pass

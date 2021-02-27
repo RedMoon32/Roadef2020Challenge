@@ -22,8 +22,9 @@ clock_t c_start;
 
 void catchAlarm(int) {
     cout << "Stop Signal Arrised, writing best found solution" << endl;
+    solution_lock.lock();
     write_result(solution_path, best_solution, d.interventions);
-    return exit(timeid);
+    exit(timeid);
 }
 
 //  executable -t time_limit -p instance_name -o new_solution_filename -name -s seed
@@ -43,6 +44,7 @@ void parse_args(int argc, char *argv[]) {
     }
 }
 
+
 int main(int argc, char *argv[]) {
     c_start = clock();
     srand(0);
@@ -51,6 +53,7 @@ int main(int argc, char *argv[]) {
 
     signal(SIGALRM, catchAlarm);
     signal(SIGKILL, catchAlarm);
+    //signal(SIGSTOP, catchAlarm);
 
     alarm((time_limit - 1) * 60);
 
@@ -60,11 +63,13 @@ int main(int argc, char *argv[]) {
     StochasticWalkSolver solver1(d);
     StochasticWalkSolver solver2(d);
 
-    thread thread1([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
-    thread thread2([&](AbstractSolver *solver) { solver->solve(); }, &solver2);
+
+    thread thread1, thread2;
+
+    thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
+    thread2 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver2);
 
     thread1.join();
     thread2.join();
 
-    catchAlarm(0);
 }
