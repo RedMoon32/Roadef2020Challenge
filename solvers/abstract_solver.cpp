@@ -8,9 +8,10 @@
 
 mutex solution_lock;
 
-void update_solution(vector<int> &new_best_solution) {
+void update_solution(vector<int> &new_best_solution, Checker& checker) {
     solution_lock.lock();
     best_solution = new_best_solution;
+    best_score = checker.checkAll(best_solution);
     solution_lock.unlock();
 }
 

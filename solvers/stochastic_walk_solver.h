@@ -2,8 +2,8 @@
 // Created by rinat on 9/15/2020.
 //
 
-#ifndef ROADEF2020CHALLENGE_IMPROVED_RANDOM_SOLVER_H
-#define ROADEF2020CHALLENGE_IMPROVED_RANDOM_SOLVER_H
+#ifndef ROADEF2020CHALLENGE_STOCHASTIC_WALK_SOLVER_H
+#define ROADEF2020CHALLENGE_STOCHASTIC_WALK_SOLVER_H
 
 #include "random_solver.h"
 #include "parser.h"
@@ -15,9 +15,13 @@ public:
 
     void pregenerateBest();
 
-    void improvePregenerated();
+    virtual void improvePregenerated();
+
+    void checkForUpdate(double new_score, vector<int>& solution, Checker& checker);
 
     vector<int> solve() override;
+
+    vector<int> bad_res;
 };
 
 

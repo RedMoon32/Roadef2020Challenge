@@ -2,7 +2,7 @@
 // Created by rinat on 9/15/2020.
 //
 
-#include "improved_random_solver.h"
+#include "stochastic_walk_solver.h"
 
 double best_score = 999999999;
 
@@ -14,7 +14,7 @@ void StochasticWalkSolver::pregenerateBest() {
         auto schedule = generateRandomSchedule();
         double score = checker.checkAll(schedule);
         if (score < best_score) {
-            update_solution(schedule);
+            update_solution(schedule, checker);
             best_score = score;
             cout << "pre iteration " << i << " new best found " << best_score << endl;
         }
@@ -22,7 +22,6 @@ void StochasticWalkSolver::pregenerateBest() {
 }
 
 void StochasticWalkSolver::improvePregenerated() {
-    vector<int> bad_res;
     vector<int> &best = best_solution;
     Checker checker(data);
     int i = 0;
@@ -40,20 +39,11 @@ void StochasticWalkSolver::improvePregenerated() {
             schedule[randindex] = cur;
         }
         double score = checker.checkAll(schedule);
-        if (score < best_score | (score > 0 && score == best_score) |
-            (round(score) == round(best_score) && rand() % 100 <= 1)) {
-            if (!checker.wrong_resource_intervention.empty())
-                bad_res = checker.wrong_resource_intervention;
+        checkForUpdate(score, schedule, checker);
 
-            update_solution(schedule);
+        if (i % 100 == 0)
+            cout << "Current best " << best_score << endl;
 
-            best_score = score;
-        }
-        if (i % 100 == 0) {
-            cout << "iteration " << i << " best found " << best_score
-                 << endl;
-            best_score = checker.checkAll(best);// other thread syncronization
-        }
         i++;
     }
 }
@@ -72,4 +62,13 @@ vector<int> StochasticWalkSolver::solve() {
     }
     cout << "Iterations done " << endl;
     return best;
+}
+
+void StochasticWalkSolver::checkForUpdate(double score, vector<int> &solution, Checker &checker) {
+    if (score < best_score |
+        (round(score) == round(best_score))) {
+        if (!checker.wrong_resource_intervention.empty())
+            bad_res = checker.wrong_resource_intervention;
+        update_solution(solution, checker);
+    }
 }

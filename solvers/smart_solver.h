@@ -6,7 +6,7 @@
 #define ROADEF2020CHALLENGE_SMART_SOLVER_H
 
 #include "parser.h"
-#include "improved_random_solver.h"
+#include "stochastic_walk_solver.h"
 
 typedef vector<vector<int>> populationVec;
 

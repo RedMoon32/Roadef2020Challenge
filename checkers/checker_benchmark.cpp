@@ -4,8 +4,9 @@
 #include <unistd.h>
 #include <csignal>
 #include "random_solver.h"
-#include "improved_random_solver.h"
+#include "stochastic_walk_solver.h"
 #include "parser.h"
+#include "hill_climber_solver.h"
 
 using namespace std;
 using namespace nlohmann;
@@ -60,8 +61,9 @@ int main(int argc, char *argv[]) {
     Parser p(instance_path);
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
-    StochasticWalkSolver solver1(d);
-    StochasticWalkSolver solver2(d);
+
+    HillClimbing solver1(d);
+    HillClimbing solver2(d);
 
 
     thread thread1, thread2;

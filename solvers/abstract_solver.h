@@ -11,8 +11,9 @@
 extern mutex solution_lock;
 extern vector<int> best_solution;
 extern bool exit_;
+extern double best_score;
 
-void update_solution(vector<int> &new_best_solution);
+void update_solution(vector<int> &new_best_solution, Checker& checker);
 
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);
 
