@@ -8,6 +8,12 @@
 
 mutex solution_lock;
 
+void update_solution(vector<int> &new_best_solution) {
+    solution_lock.lock();
+    best_solution = new_best_solution;
+    solution_lock.unlock();
+}
+
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions) {
     exit_ = true;
     usleep(2000);

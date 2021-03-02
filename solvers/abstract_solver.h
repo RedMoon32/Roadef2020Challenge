@@ -12,6 +12,8 @@ extern mutex solution_lock;
 extern vector<int> best_solution;
 extern bool exit_;
 
+void update_solution(vector<int> &new_best_solution);
+
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions);
 
 class AbstractSolver {

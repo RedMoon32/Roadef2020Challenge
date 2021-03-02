@@ -9,9 +9,14 @@
 #include "parser.h"
 
 
-class StochasticWalkSolver: public RandomSolver{
+class StochasticWalkSolver : public RandomSolver {
 public:
     using RandomSolver::RandomSolver;
+
+    void pregenerateBest();
+
+    void improvePregenerated();
+
     vector<int> solve() override;
 };
 
