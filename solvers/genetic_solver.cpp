@@ -2,7 +2,7 @@
 // Created by rinat on 12/13/2020.
 //
 
-#include "smart_solver.h"
+#include "genetic_solver.h"
 
 #define ITERATION_NUMBER 100000
 #define POP_COUNT_INITIAL 100000

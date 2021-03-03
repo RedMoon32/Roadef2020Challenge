@@ -2,8 +2,8 @@
 // Created by rinat on 12/13/2020.
 //
 
-#ifndef ROADEF2020CHALLENGE_SMART_SOLVER_H
-#define ROADEF2020CHALLENGE_SMART_SOLVER_H
+#ifndef ROADEF2020CHALLENGE_GENETIC_SOLVER_H
+#define ROADEF2020CHALLENGE_GENETIC_SOLVER_H
 
 #include "parser.h"
 #include "stochastic_walk_solver.h"
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //ROADEF2020CHALLENGE_SMART_SOLVER_H
+#endif //ROADEF2020CHALLENGE_GENETIC_SOLVER_H

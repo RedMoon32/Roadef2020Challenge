@@ -65,7 +65,6 @@ int main(int argc, char *argv[]) {
     HillClimbing solver1(d);
     HillClimbing solver2(d);
 
-
     thread thread1, thread2;
 
     thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver1);

@@ -16,7 +16,7 @@ void HillClimbing::improvePregenerated() {
         for (int c = 0; c < rand_count; c++) {
             int randindex;
 
-            if (!bad_res.empty())
+            if (rand() % 4 > 0 && !bad_res.empty())
                 randindex = bad_res[rand() % bad_res.size()];
             else
                 randindex = rand() % schedule.size();
@@ -24,10 +24,10 @@ void HillClimbing::improvePregenerated() {
             double cur_best = checker.checkAll(schedule);
             int best_time = schedule[randindex];
 
-            for (int j = 0; j < min(1, data.interventions[randindex].tmax); j++) {
+            for (int j = 0; j < min(30, data.interventions[randindex].tmax); j++) {
                 schedule[randindex] = rand() % data.interventions[randindex].tmax;
                 double score = checker.checkAll(schedule);
-                if (score < cur_best) {
+                if (score <= cur_best) {
                     best_time = schedule[randindex];
                     cur_best = score;
                 }

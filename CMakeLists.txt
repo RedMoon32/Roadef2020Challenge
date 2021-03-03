@@ -6,20 +6,27 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(checkers structs solvers tests libs)
 
 set(SOURCE_FILES
-        structs/parser.h
         libs/json.hpp
-        structs/parser.cpp
+
+        checkers/abstract_checker.h
         checkers/checker.cpp
         checkers/checker.h
+
         solvers/random_solver.cpp
         solvers/random_solver.h
-        solvers/improved_random_solver.cpp
-        solvers/improved_random_solver.h
+        solvers/stochastic_walk_solver.cpp
+        solvers/stochastic_walk_solver.h
         solvers/abstract_solver.h
         solvers/abstract_solver.cpp
-        solvers/smart_solver.h
-        solvers/smart_solver.cpp
-        structs/structs.h checkers/abstract_checker.h)
+        solvers/genetic_solver.h
+        solvers/genetic_solver.cpp
+        solvers/hill_climber_solver.h
+        solvers/hill_climber_solver.cpp
+
+        structs/parser.cpp
+        structs/structs.h
+        structs/parser.h
+        )
 
 add_executable(Roadef2020Challenge
         main.cpp
