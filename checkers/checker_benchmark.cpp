@@ -7,6 +7,7 @@
 #include "stochastic_walk_solver.h"
 #include "parser.h"
 #include "hill_climber_solver.h"
+#include "genetic_solver.h"
 
 using namespace std;
 using namespace nlohmann;
@@ -62,15 +63,15 @@ int main(int argc, char *argv[]) {
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
 
-    HillClimbing solver1(d);
-    HillClimbing solver2(d);
+    StochasticWalkSolver solver1(d);
+    StochasticWalkSolver solver2(d);
 
     thread thread1, thread2;
 
     thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
-    thread2 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver2);
+    //thread2 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver2);
 
     thread1.join();
-    thread2.join();
+    //thread2.join();
 
 }

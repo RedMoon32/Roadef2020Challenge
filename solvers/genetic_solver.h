@@ -19,7 +19,9 @@ public:
     void mutate(populationVec&);
 
     vector<int> solve() override;
+    vector<vector<int>> bad_interventions;
     unique_ptr<Checker> checker;
+
 };
 
 
