@@ -8,7 +8,8 @@
 #include "parser.h"
 #include "stochastic_walk_solver.h"
 
-typedef vector<vector<int>> populationVec;
+typedef vector<int> Individual;
+typedef vector<Individual> populationVec;
 
 class GeneticSolver: public StochasticWalkSolver{
 public:
@@ -17,9 +18,11 @@ public:
     populationVec getNBest(populationVec&);
     void crossover(populationVec&);
     void mutate(populationVec&);
-
     vector<int> solve() override;
+    int getParent(populationVec & population);
+
     vector<vector<int>> bad_interventions;
+    vector<float> fitness_scores;
     unique_ptr<Checker> checker;
 
 };

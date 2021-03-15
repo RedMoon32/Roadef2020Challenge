@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
 
-    StochasticWalkSolver solver1(d);
-    StochasticWalkSolver solver2(d);
+    GeneticSolver solver1(d);
+    GeneticSolver solver2(d);
 
     thread thread1, thread2;
 
