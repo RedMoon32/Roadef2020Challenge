@@ -20,12 +20,24 @@ string solution_path;
 bool name;
 int seed;
 int timeid = 70;
+string out_file = "abc";
+double param1 = 1;
+double param2 = 0.1;
+
 clock_t c_start;
 
 void catchAlarm(int) {
     cout << "Stop Signal Arrised, writing best found solution" << endl;
     solution_lock.lock();
     write_result(solution_path, best_solution, d.interventions);
+
+    ofstream outfile;
+    outfile.open(out_file, ios_base::app);
+    auto best_score = Checker(d).checkAll(best_solution);
+    outfile << instance_path << "," << d.interventions.size() << "," << d.resources.size() << "," << param1 << "," << param2 << "," << time_limit << "," << best_score << endl;
+    outfile.close();
+
+
     exit(timeid);
 }
 
@@ -43,6 +55,12 @@ void parse_args(int argc, char *argv[]) {
             name = true;
         if (arg == "-s")
             seed = stoi(argv[i + 1]);
+        if (arg == "-p1")
+            param1 = stod(argv[i + 1]);
+        if (arg == "-p2")
+            param2 = stod(argv[i + 1]);
+        if (arg == "-out")
+            out_file = string(argv[i + 1]);
     }
 }
 
@@ -57,14 +75,14 @@ int main(int argc, char *argv[]) {
     signal(SIGKILL, catchAlarm);
     //signal(SIGSTOP, catchAlarm);
 
-    alarm((time_limit - 1) * 60);
+    alarm(time_limit * 1 - 60);
 
     Parser p(instance_path);
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
 
-    GeneticSolver solver1(d);
-    GeneticSolver solver2(d);
+    //StochasticWalkSolver solver1(d);
+    GeneticSolver solver1(d, param1, param2);
 
     thread thread1, thread2;
 
@@ -73,5 +91,4 @@ int main(int argc, char *argv[]) {
 
     thread1.join();
     //thread2.join();
-
 }

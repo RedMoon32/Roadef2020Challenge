@@ -13,7 +13,7 @@ typedef vector<Individual> populationVec;
 
 class GeneticSolver: public StochasticWalkSolver{
 public:
-    using StochasticWalkSolver::StochasticWalkSolver;
+    GeneticSolver(const DataInstance &data, int population_size, float mutation_rate);
     populationVec getInitialPopulation();
     populationVec getNBest(populationVec&);
     void crossover(populationVec&);
@@ -24,7 +24,9 @@ public:
     vector<vector<int>> bad_interventions;
     vector<float> fitness_scores;
     unique_ptr<Checker> checker;
-
+private:
+    int population_size;
+    float mutation_rate;
 };
 
 

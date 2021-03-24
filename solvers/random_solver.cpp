@@ -24,3 +24,7 @@ vector<int> RandomSolver::generateRandomSchedule() {
     return schedule;
 }
 
+RandomSolver::RandomSolver() {}
+
+
+

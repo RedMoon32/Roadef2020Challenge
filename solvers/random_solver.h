@@ -12,9 +12,12 @@
 class RandomSolver : public AbstractSolver {
 public:
     RandomSolver(const DataInstance &data);
+
+    RandomSolver();
+
     vector<int> solve() override;
     vector<int> generateRandomSchedule();
-    const DataInstance &data;
+    DataInstance data;
 };
 
 
