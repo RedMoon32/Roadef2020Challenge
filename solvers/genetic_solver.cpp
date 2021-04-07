@@ -7,7 +7,6 @@
 #define ITERATION_NUMBER 100000
 #define POP_COUNT_INITIAL 100
 #define POPULATION_SIZE 10
-#define MUTATION_RATE 0.1
 
 int getRandomIndividual(int population_size){
     return rand() % population_size;
@@ -96,6 +95,7 @@ void GeneticSolver::crossover(populationVec & population) {
         auto& parent1 = population[parent_id1];
         auto& parent2 = population[parent_id2];
 
+
         int mid_point = rand() % data.interventions.size();
         Individual child1, child2;
 
@@ -111,6 +111,10 @@ void GeneticSolver::crossover(populationVec & population) {
             child2.push_back(parent1[i]);
         }
 
+        if (rand() % 100 >= crossover_rate) {
+            child1 = parent1;
+            child2 = parent2;
+        }
         population.push_back(child1);
         population.push_back(child2);
 
@@ -132,8 +136,8 @@ void GeneticSolver::mutate(populationVec & population) {
     }
 }
 
-GeneticSolver::GeneticSolver(const DataInstance &data, int population_size, float mutation_rate) :
-    population_size(population_size), mutation_rate(mutation_rate)
+GeneticSolver::GeneticSolver(const DataInstance &data, int population_size, float mutation_rate, float crossover_rate) :
+    population_size(population_size), mutation_rate(mutation_rate), crossover_rate(crossover_rate)
 {
     this->data = data;
 }
