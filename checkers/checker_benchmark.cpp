@@ -15,7 +15,8 @@ using namespace std::chrono;
 
 DataInstance d;
 int time_limit = 15;
-string instance_path = "../A_set/A_";
+string base_path = "../B_set_rounded/B_";
+string instance_path;
 string instance_num;
 string solution_path;
 bool name;
@@ -51,10 +52,14 @@ void parse_args(int argc, char *argv[]) {
         string arg = argv[i];
         string next_arg = ( i < argc - 1 ? argv[i + 1]: "");
 
+        if (arg == "-b")
+            base_path = next_arg;
+
         if (arg == "-t")
             time_limit = stoi(next_arg);
+
         if (arg == "-p"){
-            instance_path += (next_arg.size() == 1 ? "0" : "") + next_arg + ".json";
+            instance_path = base_path + (next_arg.size() == 1 ? "0" : "") + next_arg + ".json";
             instance_num = next_arg;
         }
         if (arg == "-o")
@@ -82,11 +87,13 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv);
     signal(SIGALRM, catchAlarm);
     alarm(time_limit*60);
+    cout << "reading.... " << instance_path << endl;
     Parser p(instance_path);
     d = p.parseJsonToSchedule();
     cout << "==== Parsed Successfully ====" << endl;
 
     GeneticSolver solver1(d, param1, param2, param3);
+    //StochasticWalkSolver solver1(d);
 
     thread thread1, thread2;
 
