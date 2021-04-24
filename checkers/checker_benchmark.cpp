@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "random_solver.h"
 #include "stochastic_walk_solver.h"
@@ -97,12 +98,13 @@ int main(int argc, char *argv[]) {
     //StochasticWalkSolver solver1(d);
     thread thread1, thread2;
     thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
+
     for (int i = 0; i < time_limit; i++) {
-        this_thread::sleep_for(std::chrono::milliseconds(60000));
+        sleep(60);
         write_cur_result(i + 1);
     }
     cout << "exiting...." << endl;
     exit_ = true;
-    this_thread::sleep_for(std::chrono::milliseconds(10000));
+    sleep(10);
     thread1.detach();
 }
