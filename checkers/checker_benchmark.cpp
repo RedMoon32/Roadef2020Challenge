@@ -39,7 +39,7 @@ void write_cur_result(int minute) {
 
     auto score_normalized = best_score < 0 ? best_score + 500000 : best_score;
 
-    outfile << base_path << "," << instance_num << "," << d.interventions.size() << "," << d.resources.size() << ","
+    outfile << minute << "," << base_path << "," << instance_num << "," << d.interventions.size() << "," << d.resources.size() << ","
             << d.exclusions.size() << "," << d.scenarious_number.size() << ","
             << param1 << ","
             << param2 << "," << param3 << "," << time_limit << ","
