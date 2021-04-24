@@ -29,7 +29,7 @@ populationVec GeneticSolver::getInitialPopulation() {
     populationVec population(POP_COUNT_INITIAL, vector<int>(n));
     for (int i = 0; i < POP_COUNT_INITIAL; i++){
         for (int j = 0; j < n; j++) {
-            int cur = (data.interventions[j].tmax > 0 ? rand() % data.interventions[j].tmax : 0);
+            int cur = rand() % data.interventions[j].tmax;
             population[i][j] = cur;
         }
     }
@@ -131,7 +131,7 @@ void GeneticSolver::mutate(populationVec & population) {
         int randindex = !bad_interventions[random_individ].empty() ?
                 bad_interventions[random_individ][rand() % bad_interventions[random_individ].size()] : // if bad intervention exists
                 rand() % data.interventions.size(); // otherwise just choose random intervention
-        int new_time = (data.interventions[randindex].tmax > 0 ? rand() % data.interventions[randindex].tmax : 0);
+        int new_time = rand() % data.interventions[randindex].tmax ;
         population[random_individ][randindex] = new_time;
     }
 }

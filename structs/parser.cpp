@@ -56,7 +56,7 @@ vector<Intervention> Parser::parseInterventions(vector<Resource> resources) {
     for (auto &intervention : this->data[INTERVENTIONS].items()) {
         auto cur = intervention.value();
         vector<int> delta = parseIntArray(cur[DELTA]);
-        int tmax = stoi(cur[TMAX].get<std::string>())-1;
+        int tmax = stoi(cur[TMAX].get<std::string>());
         auto workload = parseWorkload(resources, cur, tmax);
         auto risk = parseRisk(cur);
         intervention_name_mapper[intervention.key()] = id;
