@@ -1,8 +1,6 @@
-#include <iostream>
-#include <cstdlib>
+#include <bits/stdc++.h>
 #include <time.h>
-#include <unistd.h>
-#include <csignal>
+
 #include "random_solver.h"
 #include "stochastic_walk_solver.h"
 #include "parser.h"
@@ -30,27 +28,36 @@ double param3 = 0.2;
 
 clock_t c_start;
 
-void catchAlarm(int) {
-    cout << "Stop Signal Arrised, writing best found solution" << endl;
+void write_cur_result(int minute) {
+    cout << "Writing best found solution" << endl;
     solution_lock.lock();
-    write_result(solution_path, best_solution, d.interventions);
+    write_result(solution_path + "_m" + to_string(minute), best_solution, d.interventions);
 
     ofstream outfile;
     outfile.open(out_file, ios_base::app);
     auto best_score = Checker(d).checkAll(best_solution);
-    outfile << instance_num << "," << d.interventions.size() << "," << d.resources.size() << "," << param1 << ","
-            << param2 << "," << param3 << "," << time_limit << "," << (best_score < 0 ? best_score + 500000 : best_score)
+
+    auto score_normalized = best_score < 0 ? best_score + 500000 : best_score;
+
+    outfile << base_path << "," << instance_num << "," << d.interventions.size() << "," << d.resources.size() << ","
+            << d.exclusions.size() << "," << d.scenarious_number.size() << ","
+            << param1 << ","
+            << param2 << "," << param3 << "," << time_limit << ","
+            << score_normalized << ","
             << (best_score < 0)
             << endl;
+
+    cout << "# Minute: " << minute << " Fitness: " << score_normalized << endl << endl;
+
     outfile.close();
-    exit(timeid);
+    solution_lock.unlock();
 }
 
 //  executable -t time_limit -p instance_name -o new_solution_filename -name -s seed
 void parse_args(int argc, char *argv[]) {
     for (int i = 0; i < argc; i++) {
         string arg = argv[i];
-        string next_arg = ( i < argc - 1 ? argv[i + 1]: "");
+        string next_arg = (i < argc - 1 ? argv[i + 1] : "");
 
         if (arg == "-b")
             base_path = next_arg;
@@ -58,7 +65,7 @@ void parse_args(int argc, char *argv[]) {
         if (arg == "-t")
             time_limit = stoi(next_arg);
 
-        if (arg == "-p"){
+        if (arg == "-p") {
             instance_path = base_path + (next_arg.size() == 1 ? "0" : "") + next_arg + ".json";
             instance_num = next_arg;
         }
@@ -83,22 +90,19 @@ void parse_args(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     c_start = clock();
     srand(0);
-    cout << "==== Reading Data ===" << endl;
     parse_args(argc, argv);
-    signal(SIGALRM, catchAlarm);
-    alarm(time_limit*60);
-    cout << "reading.... " << instance_path << endl;
     Parser p(instance_path);
     d = p.parseJsonToSchedule();
-    cout << "==== Parsed Successfully ====" << endl;
-
     GeneticSolver solver1(d, param1, param2, param3);
     //StochasticWalkSolver solver1(d);
-
     thread thread1, thread2;
-
     thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
-
-    thread1.join();
-
+    for (int i = 0; i < time_limit; i++) {
+        this_thread::sleep_for(std::chrono::milliseconds(60000));
+        write_cur_result(i + 1);
+    }
+    cout << "exiting...." << endl;
+    exit_ = true;
+    this_thread::sleep_for(std::chrono::milliseconds(10000));
+    thread1.detach();
 }

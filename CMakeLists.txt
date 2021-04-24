@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 project(Roadef2020Challenge)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -37,10 +37,10 @@ add_executable(challengeRTE
         checkers/checker_benchmark.cpp
         ${SOURCE_FILES})
 
-add_executable(Tests
-        tests/test_all.cpp
-        ${SOURCE_FILES}
-        )
+#add_executable(Tests
+#        tests/test_all.cpp
+#        ${SOURCE_FILES}
+#        )
 
 find_package(Threads)
 target_link_libraries(challengeRTE ${CMAKE_THREAD_LIBS_INIT})

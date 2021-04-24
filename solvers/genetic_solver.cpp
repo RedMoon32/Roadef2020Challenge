@@ -5,7 +5,7 @@
 #include "genetic_solver.h"
 
 #define ITERATION_NUMBER 100000
-#define POP_COUNT_INITIAL 100
+#define POP_COUNT_INITIAL 1000
 #define POPULATION_SIZE 10
 
 int getRandomIndividual(int population_size){
@@ -16,12 +16,10 @@ vector<int> GeneticSolver::solve() {
     vector<int> schedule(data.interventions.size());
     checker = make_unique<Checker>(data);
     auto population = getInitialPopulation();
-    for (int i = 0; i < ITERATION_NUMBER; i ++){
+    for (int i = 0; i < ITERATION_NUMBER & !exit_; i ++){
         population = getNBest(population);
         crossover(population);
         mutate(population);
-        float score = checker->checkAll(best_solution);
-        cout << " Fitness: " << (score < 0 ? (score+500000): score) << endl;
     }
     return population[0];
 }
@@ -30,8 +28,8 @@ populationVec GeneticSolver::getInitialPopulation() {
     int n = data.interventions.size();
     populationVec population(POP_COUNT_INITIAL, vector<int>(n));
     for (int i = 0; i < POP_COUNT_INITIAL; i++){
-        for (int j = 0; j < data.interventions.size(); j++) {
-            int cur = rand() % data.interventions[j].tmax;
+        for (int j = 0; j < n; j++) {
+            int cur = (data.interventions[j].tmax > 0 ? rand() % data.interventions[j].tmax : 0);
             population[i][j] = cur;
         }
     }
@@ -62,7 +60,9 @@ populationVec GeneticSolver::getNBest(populationVec &population) {
         bad_interventions.push_back(cur_bad_interventions[ind]);
         fitness_scores.push_back(scores[ind]);
     }
-    best_solution = sorted_population[0];
+
+    if (scores[0] < best_score)
+        update_solution(sorted_population[0], *checker);
 
     return sorted_population;
 }
@@ -111,7 +111,7 @@ void GeneticSolver::crossover(populationVec & population) {
             child2.push_back(parent1[i]);
         }
 
-        if (rand() % 100 >= crossover_rate) {
+        if (rand() % 100 >= crossover_rate * 100) {
             child1 = parent1;
             child2 = parent2;
         }
@@ -131,7 +131,7 @@ void GeneticSolver::mutate(populationVec & population) {
         int randindex = !bad_interventions[random_individ].empty() ?
                 bad_interventions[random_individ][rand() % bad_interventions[random_individ].size()] : // if bad intervention exists
                 rand() % data.interventions.size(); // otherwise just choose random intervention
-        int new_time = rand() % data.interventions[randindex].tmax;
+        int new_time = (data.interventions[randindex].tmax > 0 ? rand() % data.interventions[randindex].tmax : 0);
         population[random_individ][randindex] = new_time;
     }
 }
