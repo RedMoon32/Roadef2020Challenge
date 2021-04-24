@@ -61,9 +61,9 @@ populationVec GeneticSolver::getNBest(populationVec &population) {
         fitness_scores.push_back(scores[ind]);
     }
 
-    if (scores[0] < best_score)
+    if (scores[0] < best_score) {
         update_solution(sorted_population[0], *checker);
-
+    }
     return sorted_population;
 }
 
@@ -128,7 +128,7 @@ void GeneticSolver::mutate(populationVec & population) {
     int mutations_count = population.size() * data.interventions.size() * mutation_rate;
     for (int i = 0; i < mutations_count; i++) {
         int random_individ = rand() % population.size();
-        int randindex = !bad_interventions[random_individ].empty() ?
+        int randindex = (!bad_interventions[random_individ].empty() & (rand() % 2 == 0))?
                 bad_interventions[random_individ][rand() % bad_interventions[random_individ].size()] : // if bad intervention exists
                 rand() % data.interventions.size(); // otherwise just choose random intervention
         int new_time = rand() % data.interventions[randindex].tmax ;
