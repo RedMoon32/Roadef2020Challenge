@@ -13,6 +13,8 @@ class StochasticWalkSolver : public RandomSolver {
 public:
     using RandomSolver::RandomSolver;
 
+    StochasticWalkSolver(const DataInstance &data, float change_percent, float neigbors_percent, bool hill_climbing);
+
     void pregenerateBest();
 
     virtual void improvePregenerated();
@@ -22,6 +24,9 @@ public:
     vector<int> solve() override;
 
     vector<int> bad_res;
+private:
+    float change_percent, neighbors_percent;
+    bool hill_climbing;
 };
 
 

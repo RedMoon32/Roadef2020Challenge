@@ -17,8 +17,6 @@ void update_solution(vector<int> &new_best_solution, Checker& checker) {
 
 void write_result(string path, vector<int> schedule, const vector<Intervention> &interventions) {
     usleep(2000);
-
-    cout << "Writing result to file" << endl;
     ofstream out;
     out.open(path);
 
@@ -26,5 +24,4 @@ void write_result(string path, vector<int> schedule, const vector<Intervention> 
         out << interventions[ind].name << " " << schedule[ind] + 1 << endl;
     }
     out.close();
-    cout << "Wrote result" << endl;
 }
