@@ -5,7 +5,6 @@
 #include "random_solver.h"
 #include "stochastic_walk_solver.h"
 #include "parser.h"
-#include "hill_climber_solver.h"
 #include "genetic_solver.h"
 
 using namespace std;
@@ -48,7 +47,7 @@ void write_cur_result(int minute) {
             << (best_score < 0)
             << endl;
 
-    cout << "# Minute: " << minute << " Fitness: " << score_normalized << endl << endl;
+    cout << "# Minute: " << minute << ", Fitness: " << score_normalized << endl << endl;
 
     outfile.close();
     solution_lock.unlock();
@@ -70,18 +69,25 @@ void parse_args(int argc, char *argv[]) {
             instance_path = base_path + (next_arg.size() == 1 ? "0" : "") + next_arg + ".json";
             instance_num = next_arg;
         }
+
         if (arg == "-o")
             solution_path = next_arg;
+
         if (arg == "-name")
             name = true;
+
         if (arg == "-s")
             seed = stoi(next_arg);
+
         if (arg == "-p1")
             param1 = stod(next_arg);
+
         if (arg == "-p2")
             param2 = stod(next_arg);
+
         if (arg == "-p3")
             param3 = stod(next_arg);
+
         if (arg == "-out")
             out_file = next_arg;
     }
@@ -94,9 +100,12 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv);
     Parser p(instance_path);
     d = p.parseJsonToSchedule();
-    GeneticSolver solver1(d, param1, param2, param3);
-    //StochasticWalkSolver solver1(d);
+
+    //GeneticSolver solver1(d, param1, param2, param3);
+    StochasticWalkSolver solver1(d, param1, 1, false);
     thread thread1, thread2;
+
+    cout << "Computing solution......." << endl;
     thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
 
     for (int i = 0; i < time_limit; i++) {

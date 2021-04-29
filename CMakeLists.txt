@@ -20,8 +20,6 @@ set(SOURCE_FILES
         solvers/abstract_solver.cpp
         solvers/genetic_solver.h
         solvers/genetic_solver.cpp
-        solvers/hill_climber_solver.h
-        solvers/hill_climber_solver.cpp
 
         structs/parser.cpp
         structs/structs.h
