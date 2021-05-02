@@ -23,8 +23,8 @@ int timeid = 70;
 string out_file;
 int instance_number;
 double param1 = 1;
-double param2 = 0.1;
-double param3 = 0.2;
+double param2 = -1;
+double param3 = -1;
 
 clock_t c_start;
 
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     d = p.parseJsonToSchedule();
 
     //GeneticSolver solver1(d, param1, param2, param3);
-    StochasticWalkSolver solver1(d, param1, 1, false);
+    StochasticWalkSolver solver1(d, param1, param2, false);
     thread thread1, thread2;
 
     cout << "Computing solution......." << endl;

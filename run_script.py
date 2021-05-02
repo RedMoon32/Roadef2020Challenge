@@ -1,7 +1,7 @@
 import os
 from multiprocessing.pool import ThreadPool
 
-time_limit = 1
+time_limit = 15
 
 
 def bruteforce_intervention(job_number):
@@ -12,7 +12,7 @@ def bruteforce_intervention(job_number):
 
                     res_path = os.path.join('./results/',
                                             f'{base_path[-2]}_{job_number}_{population_size}_{mutation_rate}_{crossover_rate}')
-                    params = f"./cmake-build-debug/challengeRTE -b {base_path} -t {time_limit} -p {job_number} -o " \
+                    params = f"./challengeRTE -b {base_path} -t {time_limit} -p {job_number} -o " \
                              f"{res_path} -p1 {population_size} -p2 {mutation_rate} -p3 {crossover_rate} -out res.csv"
 
                     print(
@@ -29,6 +29,6 @@ if __name__ == "__main__":
     except:
         pass
 
-    pool = ThreadPool(2)
-    pool.map(bruteforce_intervention, list(range(1, 3)))
+    pool = ThreadPool(16)
+    pool.map(bruteforce_intervention, list(range(1, 16)))
     pool.join()

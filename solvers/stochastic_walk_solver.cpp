@@ -50,8 +50,6 @@ void StochasticWalkSolver::improvePregenerated() {
             double score = checker.checkAll(schedule);
             checkForUpdate(score, schedule, checker);
 
-            if (!hill_climbing)
-                break;
         }
     }
 }
@@ -81,6 +79,6 @@ void StochasticWalkSolver::checkForUpdate(double score, vector<int> &solution, C
 StochasticWalkSolver::StochasticWalkSolver(const DataInstance &data, float change_percent, float neighbors_percent,
                                            bool hill_climbing) : RandomSolver(data), change_percent(change_percent),
                                                                  neighbors_percent(neighbors_percent),
-                                                                 hill_climbing(hill_climbing) {
+                                                                 hill_climbing(false) {
 
 }

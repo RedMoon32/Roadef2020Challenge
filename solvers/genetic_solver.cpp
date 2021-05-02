@@ -126,7 +126,7 @@ void GeneticSolver::crossover(populationVec & population) {
 
 void GeneticSolver::mutate(populationVec & population) {
     int mutations_count = population.size() * data.interventions.size() * mutation_rate;
-    for (int i = 0; i < mutations_count; i++) {
+    for (int i = 0; i <= mutations_count; i++) {
         int random_individ = rand() % population.size();
         int randindex = (!bad_interventions[random_individ].empty() & (rand() % 2 == 0))?
                 bad_interventions[random_individ][rand() % bad_interventions[random_individ].size()] : // if bad intervention exists
