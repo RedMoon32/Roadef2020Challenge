@@ -24,7 +24,8 @@ def bruteforce_intervention(job_number):
 if __name__ == "__main__":
     print("Running hil climbing solver.....")
 
-    os.makedirs(os.path.join(results_path, "results_hill_climbing"), exist_ok=True)
+    results_path = os.path.join(results_path, "results_hill_climbing")
+    os.makedirs(results_path, exist_ok=True)
 
     pool = ThreadPool(16)
     pool.map(bruteforce_intervention, list(range(1, 16)))

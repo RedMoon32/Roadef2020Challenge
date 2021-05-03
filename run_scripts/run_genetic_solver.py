@@ -26,7 +26,8 @@ def bruteforce_intervention(job_number):
 if __name__ == "__main__":
     print("Running genetic solver.....")
 
-    os.makedirs(os.path.join(results_path, "results_genetic"), exist_ok=True)
+    results_path = os.path.join(results_path, "results_genetic")
+    os.makedirs(results_path, exist_ok=True)
 
     pool = ThreadPool(16)
     pool.map(bruteforce_intervention, list(range(1, 16)))

@@ -4,3 +4,5 @@ venv
 cmake-build-debug
 out.txt
 A_set/
+.vscode/
+B_set_rounded
