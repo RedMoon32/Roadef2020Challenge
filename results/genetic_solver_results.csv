@@ -1,3 +1,4 @@
+minute,instance_Number, interventions_number,resources_number,population_size,mutation_rate,crossover_rate,time_limit,score,is_solved
 1,181,9,50,0.03,0.75,2,2011.611
 1,181,9,50,0.03,0.75,2,2009.451
 1,181,9,50,0.03,0.75,2,2009.451

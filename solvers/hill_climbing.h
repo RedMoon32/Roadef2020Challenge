@@ -2,18 +2,18 @@
 // Created by rinat on 9/15/2020.
 //
 
-#ifndef ROADEF2020CHALLENGE_STOCHASTIC_WALK_SOLVER_H
-#define ROADEF2020CHALLENGE_STOCHASTIC_WALK_SOLVER_H
+#ifndef ROADEF2020CHALLENGE_HILL_CLIMBING_H
+#define ROADEF2020CHALLENGE_HILL_CLIMBING_H
 
 #include "random_solver.h"
 #include "parser.h"
 
 
-class StochasticWalkSolver : public RandomSolver {
+class HillClimbingSASolver : public RandomSolver {
 public:
     using RandomSolver::RandomSolver;
 
-    StochasticWalkSolver(const DataInstance &data, float change_percent, float neigbors_percent, float initial_tempreature, bool simulated_annealing);
+    HillClimbingSASolver(const DataInstance &data, float change_percent, float neigbors_percent, float initial_tempreature, bool simulated_annealing);
 
     void pregenerateBest();
 

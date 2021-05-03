@@ -2,11 +2,11 @@
 // Created by rinat on 9/15/2020.
 //
 
-#include "stochastic_walk_solver.h"
+#include "hill_climbing.h"
 
 double best_score = 999999999;
 
-void StochasticWalkSolver::pregenerateBest() {
+void HillClimbingSASolver::pregenerateBest() {
     vector<int> &best = best_solution;
     Checker checker(data);
     cout.precision(10);
@@ -20,7 +20,7 @@ void StochasticWalkSolver::pregenerateBest() {
     }
 }
 
-void StochasticWalkSolver::improvePregenerated() {
+void HillClimbingSASolver::improvePregenerated() {
     Checker checker(data);
 
     int neighbors_count = max(1, (int) (neighbors_percent * data.interventions.size()));
@@ -55,7 +55,7 @@ void StochasticWalkSolver::improvePregenerated() {
 }
 
 
-vector<int> StochasticWalkSolver::solve() {
+vector<int> HillClimbingSASolver::solve() {
     vector<int> schedule(data.interventions.size());
     vector<int> &best = best_solution;
     cout.precision(10);
@@ -68,7 +68,7 @@ vector<int> StochasticWalkSolver::solve() {
     return best;
 }
 
-void StochasticWalkSolver::checkForUpdate(double score, vector<int> &solution, int iter, Checker &checker) {
+void HillClimbingSASolver::checkForUpdate(double score, vector<int> &solution, int iter, Checker &checker) {
     float t = initial_tempreature / (float) (iter + 1);
     float p = exp(-(float)(score - best_score)/t);
 
@@ -84,7 +84,7 @@ void StochasticWalkSolver::checkForUpdate(double score, vector<int> &solution, i
     }
 }
 
-StochasticWalkSolver::StochasticWalkSolver(const DataInstance &data, float change_percent, float neighbors_percent,
+HillClimbingSASolver::HillClimbingSASolver(const DataInstance &data, float change_percent, float neighbors_percent,
                                            float initial_tempreature,
                                            bool simulated_annealing) : RandomSolver(data),
                                                                        change_percent(change_percent),

@@ -14,8 +14,8 @@ set(SOURCE_FILES
 
         solvers/random_solver.cpp
         solvers/random_solver.h
-        solvers/stochastic_walk_solver.cpp
-        solvers/stochastic_walk_solver.h
+        solvers/hill_climbing.cpp
+        solvers/hill_climbing.h
         solvers/abstract_solver.h
         solvers/abstract_solver.cpp
         solvers/genetic_solver.h
@@ -26,19 +26,11 @@ set(SOURCE_FILES
         structs/parser.h
         )
 
-add_executable(Roadef2020Challenge
-        main.cpp
-        ${SOURCE_FILES}
-        )
 
 add_executable(challengeRTE
         checkers/checker_benchmark.cpp
         ${SOURCE_FILES})
 
-#add_executable(Tests
-#        tests/test_all.cpp
-#        ${SOURCE_FILES}
-#        )
 
 find_package(Threads)
 target_link_libraries(challengeRTE ${CMAKE_THREAD_LIBS_INIT})

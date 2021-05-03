@@ -6,12 +6,12 @@
 #define ROADEF2020CHALLENGE_GENETIC_SOLVER_H
 
 #include "parser.h"
-#include "stochastic_walk_solver.h"
+#include "hill_climbing.h"
 
 typedef vector<int> Individual;
 typedef vector<Individual> populationVec;
 
-class GeneticSolver: public StochasticWalkSolver{
+class GeneticSolver: public HillClimbingSASolver{
 public:
     GeneticSolver(const DataInstance &data, int population_size, float mutation_rate, float crossover_rate);
     populationVec getInitialPopulation();
