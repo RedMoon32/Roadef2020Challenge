@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     d = p.parseJsonToSchedule();
 
     //GeneticSolver solver1(d, param1, param2, param3);
-    StochasticWalkSolver solver1(d, param1, param2, false);
+    StochasticWalkSolver solver1(d, param1, param2, param3, true);
     thread thread1, thread2;
 
     cout << "Computing solution......." << endl;

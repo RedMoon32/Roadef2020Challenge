@@ -13,20 +13,22 @@ class StochasticWalkSolver : public RandomSolver {
 public:
     using RandomSolver::RandomSolver;
 
-    StochasticWalkSolver(const DataInstance &data, float change_percent, float neigbors_percent, bool hill_climbing);
+    StochasticWalkSolver(const DataInstance &data, float change_percent, float neigbors_percent, float initial_tempreature, bool simulated_annealing);
 
     void pregenerateBest();
 
     virtual void improvePregenerated();
 
-    void checkForUpdate(double new_score, vector<int>& solution, Checker& checker);
+    void checkForUpdate(double new_score, vector<int>& solution, int iter, Checker& checker);
 
     vector<int> solve() override;
 
     vector<int> bad_res;
 private:
     float change_percent, neighbors_percent;
-    bool hill_climbing;
+    bool simulated_annealing;
+    float initial_tempreature;
+    vector<int> prev_schedule;
 };
 
 

@@ -29,7 +29,7 @@ void StochasticWalkSolver::improvePregenerated() {
     for (int i = 0; !exit_; i++) {
 
         auto schedule = best_solution;
-        auto prev_schedule = schedule;
+        prev_schedule = schedule;
 
         for (int n = 0; n < neighbors_count; n++) {
 
@@ -48,7 +48,7 @@ void StochasticWalkSolver::improvePregenerated() {
             }
 
             double score = checker.checkAll(schedule);
-            checkForUpdate(score, schedule, checker);
+            checkForUpdate(score, schedule, i, checker);
 
         }
     }
@@ -68,8 +68,16 @@ vector<int> StochasticWalkSolver::solve() {
     return best;
 }
 
-void StochasticWalkSolver::checkForUpdate(double score, vector<int> &solution, Checker &checker) {
-    if (score <= best_score) {
+void StochasticWalkSolver::checkForUpdate(double score, vector<int> &solution, int iter, Checker &checker) {
+    float t = initial_tempreature / (float) (iter + 1);
+    float p = exp(-(float)(score - best_score)/t);
+
+    bool simul_ = (score > best_score) && (simulated_annealing) && (rand() % 100 <= p * 100);
+
+    if (score <= best_score || simul_) {
+        if (simul_) {
+            prev_schedule = solution;
+        }
         if (!checker.wrong_resource_intervention.empty())
             bad_res = checker.wrong_resource_intervention;
         update_solution(solution, checker);
@@ -77,8 +85,11 @@ void StochasticWalkSolver::checkForUpdate(double score, vector<int> &solution, C
 }
 
 StochasticWalkSolver::StochasticWalkSolver(const DataInstance &data, float change_percent, float neighbors_percent,
-                                           bool hill_climbing) : RandomSolver(data), change_percent(change_percent),
-                                                                 neighbors_percent(neighbors_percent),
-                                                                 hill_climbing(false) {
+                                           float initial_tempreature,
+                                           bool simulated_annealing) : RandomSolver(data),
+                                                                       change_percent(change_percent),
+                                                                       neighbors_percent(neighbors_percent),
+                                                                       initial_tempreature(initial_tempreature),
+                                                                       simulated_annealing(simulated_annealing) {
 
 }
