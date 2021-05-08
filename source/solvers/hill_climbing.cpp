@@ -25,10 +25,11 @@ void HillClimbingSASolver::improvePregenerated() {
 
     int neighbors_count = max(1, (int) (neighbors_percent * data.interventions.size()));
     int rand_count = max(1, (int) (change_percent * data.interventions.size()));
+    cur_best = best_solution;
 
     for (int i = 0; !exit_; i++) {
 
-        auto schedule = best_solution;
+        auto schedule = cur_best;
         prev_schedule = schedule;
 
         for (int n = 0; n < neighbors_count; n++) {
@@ -74,13 +75,24 @@ void HillClimbingSASolver::checkForUpdate(double score, vector<int> &solution, i
 
     bool simul_ = (score > best_score) && (simulated_annealing) && (rand() % 100 <= p * 100);
 
-    if (score <= best_score || simul_) {
-        if (simul_) {
-            prev_schedule = solution;
-        }
+    if (score <= cur_best_score || simul_) {
         if (!checker.wrong_resource_intervention.empty())
             bad_res = checker.wrong_resource_intervention;
-        update_solution(solution, checker);
+
+        if (simul_) {
+            prev_schedule = solution;
+            cur_best = solution;
+            cur_best_score = score;
+        }
+
+        if (score <= cur_best_score){
+            cur_best = solution;
+            cur_best_score = score;
+        }
+
+        if (score <= best_score) {
+            update_solution(solution, checker);
+        }
     }
 }
 

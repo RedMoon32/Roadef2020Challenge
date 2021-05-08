@@ -29,6 +29,8 @@ private:
     bool simulated_annealing;
     float initial_tempreature;
     vector<int> prev_schedule;
+    vector<int> cur_best;
+    double cur_best_score = 9999999999;
 };
 
 
