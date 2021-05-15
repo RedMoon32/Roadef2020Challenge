@@ -25,6 +25,7 @@ int instance_number;
 double param1 = 1;
 double param2 = -1;
 double param3 = -1;
+string solver;
 
 clock_t c_start;
 
@@ -90,23 +91,39 @@ void parse_args(int argc, char *argv[]) {
 
         if (arg == "-out")
             out_file = next_arg;
+
+        if (arg == "-solver")
+            solver = next_arg;
     }
 }
 
 
 int main(int argc, char *argv[]) {
     c_start = clock();
-    srand(0);
+    //srand(0);
     parse_args(argc, argv);
     Parser p(instance_path);
     d = p.parseJsonToSchedule();
 
     //GeneticSolver solver1(d, param1, param2, param3);
-    HillClimbingSASolver solver1(d, param1, param2, param3, true);
+    HillClimbingSASolver SA(d, param1, param2, param3, true);
+    GeneticSolver GA(d, param1, param2, param3);
+    HillClimbingSASolver HC(d, param1, param2, param3, false);
+
     thread thread1, thread2;
 
     cout << "Computing solution......." << endl;
-    thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &solver1);
+
+    if (solver == "sa")
+        thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &SA);
+    else if (solver == "ga")
+        thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &GA);
+    else if (solver == "hc")
+        thread1 = thread([&](AbstractSolver *solver) { solver->solve(); }, &HC);
+    else{
+        cout << "WRONG SOLVER" << endl;
+        exit(-1);
+    }
 
     for (int i = 0; i < time_limit; i++) {
         sleep(60);
